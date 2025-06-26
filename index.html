@@ -5,90 +5,67 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reloj Avanzado</title>
-    <!-- Enlace al archivo CSS -->
     <link rel="stylesheet" href="style.css">
-    <!-- Precarga de fuentes de Google Fonts para mejorar rendimiento -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Enlace a la fuente Share Tech Mono de Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
-<body>
-    <!-- Contenedor principal de la aplicación -->
-    <div class="container">
-        <!-- Sección del reloj principal -->
-        <div class="reloj-principal">
-            <p class="fecha"></p> <!-- Elemento para mostrar la fecha -->
-            <p class="tiempo"></p> <!-- Elemento para mostrar la hora -->
+<body data-mode="clock">
+
+    <div class="main-display-container">
+        <nav class="mode-nav">
+            <button class="mode-btn active" data-mode="clock">Reloj</button>
+            <button class="mode-btn" data-mode="stopwatch">Cronómetro</button>
+            <button class="mode-btn" data-mode="timer">Temporizador</button>
+        </nav>
+
+        <div class="mode-view clock-view">
+            <div class="reloj-principal">
+                <p class="fecha"></p>
+                <p class="tiempo"></p>
+                <div class="weather-container">
+                    <img src="" alt="Icono del tiempo" class="weather-icon">
+                    <span class="weather-temp"></span>
+                    <span class="weather-city"></span>
+                </div>
+            </div>
         </div>
 
-        <!-- Contenedor para todos los controles -->
-        <div class="controles">
-            <!-- Sección de Alarma -->
-            <fieldset class="control-seccion">
-                <legend>Alarma</legend> <!-- Título de la sección -->
-                <!-- Input para seleccionar la hora de la alarma -->
-                <input type="time" id="alarmTime" title="Establecer hora de alarma">
-                <!-- Input para el mensaje de la alarma (opcional) -->
-                <input type="text" id="alarmMessage" placeholder="Mensaje (opcional)">
-                <!-- Botón para establecer la alarma -->
-                <button id="setAlarmBtn">Establecer Alarma</button>
-                <!-- Lista donde se mostrarán las alarmas activas -->
-                <div id="alarmList">
-                    <h4>Alarmas Activas:</h4>
-                    <ul></ul>
-                </div>
-            </fieldset>
+        <div class="mode-view stopwatch-view">
+            <p class="stopwatch-time">00:00:00.000</p>
+            <div class="stopwatch-controls">
+                <button id="startStopwatchBtn">Iniciar</button>
+                <button id="lapBtn" disabled>Vuelta</button>
+                <button id="resetStopwatchBtn" disabled>Reiniciar</button>
+            </div>
+            <ul class="laps-list"></ul>
+        </div>
 
-            <!-- Sección de Personalización de Colores -->
-            <fieldset class="control-seccion">
-                <legend>Colores</legend> <!-- Título de la sección -->
-                <div>
-                    <label for="textColor">Color Texto:</label>
-                    <input type="color" id="textColor" value="#FFFFFF"> <!-- Selector de color para el texto -->
-                </div>
-                <div>
-                    <label for="bgColor1">Fondo (Inicio Grad.):</label>
-                    <input type="color" id="bgColor1" value="#0000FF"> <!-- Selector de color para inicio del gradiente de fondo -->
-                </div>
-                <div>
-                    <label for="bgColor2">Fondo (Fin Grad.):</label>
-                    <input type="color" id="bgColor2" value="#000000"> <!-- Selector de color para fin del gradiente de fondo -->
-                </div>
-                <div>
-                    <label for="glowColor1">Brillo Texto 1:</label>
-                    <input type="color" id="glowColor1" value="#E6AB0A"> <!-- Selector de color para el primer brillo del texto -->
-                </div>
-                <div>
-                    <label for="glowColor2">Brillo Texto 2:</label>
-                    <input type="color" id="glowColor2" value="#FFFF16"> <!-- Selector de color para el segundo brillo del texto -->
-                </div>
-            </fieldset>
-
-            <!-- Sección de Zonas Horarias Adicionales -->
-            <fieldset class="control-seccion">
-                <legend>Zonas Horarias Adicionales</legend> <!-- Título de la sección -->
-                <!-- Selector para elegir una zona horaria -->
-                <select id="timeZoneSelect">
-                    <option value="">Seleccionar zona horaria...</option>
-                    <option value="America/New_York">Nueva York</option>
-                    <option value="Europe/London">Londres</option>
-                    <option value="Asia/Tokyo">Tokio</option>
-                    <option value="Australia/Sydney">Sydney</option>
-                    <option value="Europe/Paris">París</option>
-                    <option value="America/Los_Angeles">Los Ángeles</option>
-                </select>
-                <!-- Botón para añadir el reloj de la zona horaria seleccionada -->
-                <button id="addTimeZoneBtn">Añadir Reloj</button>
-                <!-- Contenedor donde se insertarán los relojes adicionales -->
-                <div id="additionalClocksContainer">
-                </div>
-            </fieldset>
-            <!-- La sección de Formato Fecha/Hora ha sido eliminada -->
+        <div class="mode-view timer-view">
+            <div class="timer-inputs">
+                <input type="number" id="timerMinutes" min="0" max="99" value="5" placeholder="MM">
+                <span>:</span>
+                <input type="number" id="timerSeconds" min="0" max="59" value="0" placeholder="SS">
+            </div>
+            <p class="timer-countdown">05:00</p>
+            <div class="timer-controls">
+                <button id="startTimerBtn">Iniciar</button>
+                <button id="stopTimerBtn" disabled>Parar</button>
+                <button id="resetTimerBtn" disabled>Reiniciar</button>
+            </div>
         </div>
     </div>
 
-    <!-- Enlace al archivo JavaScript -->
+    <div class="controles-container">
+        <fieldset class="control-seccion"><legend>Alarma</legend><input type="time" id="alarmTime"><input type="text" id="alarmMessage" placeholder="Mensaje (opcional)"><button id="setAlarmBtn">Establecer Alarma</button><div id="alarmList"><h4>Alarmas Activas:</h4><ul></ul></div></fieldset>
+        <fieldset class="control-seccion"><legend>Colores</legend><div><label for="textColor">Texto:</label><input type="color" id="textColor"></div><div><label for="bgColor1">Fondo 1:</label><input type="color" id="bgColor1"></div><div><label for="bgColor2">Fondo 2:</label><input type="color" id="bgColor2"></div><div><label for="glowColor1">Brillo:</label><input type="color" id="glowColor1"></div><div class="theme-buttons"><button class="theme-btn" data-theme="neon-classic">Neón Clásico</button><button class="theme-btn" data-theme="ocean">Océano</button><button class="theme-btn" data-theme="sunset">Atardecer</button><button class="theme-btn" data-theme="matrix">Matrix</button></div></fieldset>
+        <fieldset class="control-seccion"><legend>Ubicación del Clima</legend><div class="location-input-group"><input type="text" id="locationInput" placeholder="Ej: Madrid, ES"><button id="geolocateBtn" title="Usar mi ubicación actual">📍</button></div><button id="searchWeatherBtn">Buscar Ciudad</button></fieldset>
+        <fieldset class="control-seccion"><legend>Zonas Horarias</legend><select id="timeZoneSelect"><option value="">Seleccionar zona...</option><option value="America/New_York">Nueva York</option><option value="Europe/London">Londres</option><option value="Asia/Tokyo">Tokio</option></select><button id="addTimeZoneBtn">Añadir Reloj</button><div id="additionalClocksContainer"></div></fieldset>
+    </div>
+
+    <button id="toggleControlsBtn" title="Mostrar/Ocultar Controles">⚙️</button>
+    <div id="alarmDialogOverlay" class="dialog-overlay"><div class="dialog-box"><h3>¡Alarma!</h3><p id="dialogMessage"></p><div class="dialog-buttons"><button id="snoozeBtn">Posponer (5 min)</button><button id="stopAlarmBtn">Detener</button></div></div></div>
+
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,40 +1,196 @@
-*{
+/* Definición de variables CSS para colores, permitiendo fácil personalización */
+:root {
+    --text-color: #FFFFFF; /* Color de texto por defecto */
+    --bg-color-1: blue;    /* Color de inicio del gradiente de fondo */
+    --bg-color-2: #000000; /* Color de fin del gradiente de fondo */
+    --glow-color-1: rgb(230, 171, 10); /* Primer color del brillo del texto */
+    --glow-color-2: rgb(255, 255, 22);  /* Segundo color del brillo del texto */
+}
+
+/* Reset básico de estilos y box-sizing para todos los elementos */
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
 
-body{
+/* Estilos para el cuerpo de la página */
+body {
     width: 100%;
-    height: 100vh;
-    background: #2f0202;
-    background: radial-gradient(ellipse at center, blue 0%, #000000);
-    background-size: 100%; 
+    min-height: 100vh; /* Altura mínima para ocupar toda la ventana, permitiendo scroll si el contenido es largo */
+    font-family: 'Share Tech Mono', monospace; /* Fuente principal de la aplicación */
+    color: var(--text-color); /* Color de texto usando la variable CSS */
+    /* Fondo con gradiente radial usando variables CSS */
+    background: radial-gradient(ellipse at center, var(--bg-color-1) 0%, var(--bg-color-2) 100%);
+    background-size: 100% 100%; /* Asegura que el gradiente cubra todo el fondo */
+    overflow-x: hidden; /* Evita la barra de scroll horizontal */
+    padding-bottom: 20px; /* Espacio inferior para que el contenido no pegue al borde */
 }
 
-p{
-    margin: 0;
-    padding: 0;
+/* Contenedor principal para centrar y organizar el contenido */
+.container {
+    display: flex;
+    flex-direction: column; /* Organiza los hijos (reloj y controles) verticalmente */
+    align-items: center; /* Centra los hijos horizontalmente */
+    padding: 20px; /* Espaciado interno */
 }
 
-.reloj{
-    font-family: 'share tech mono', monospace;
-    color: #ffffff;
-    text-align: center;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    text-shadow: 0 0 20px rgb(230, 171, 10),0 0 20px rgb(255, 255, 22);
-
+/* Estilos para el bloque del reloj principal */
+.reloj-principal {
+    text-align: center; /* Centra el texto del reloj */
+    margin-bottom: 30px; /* Espacio debajo del reloj antes de los controles */
+    /* Sombra de texto para efecto de brillo, usando variables CSS */
+    text-shadow: 0 0 20px var(--glow-color-1), 0 0 20px var(--glow-color-2);
+    letter-spacing: 0.1em; /* Espaciado entre letras */
 }
 
-.fecha{
-    letter-spacing: 0.1em;
+/* Estilos para el párrafo de la fecha */
+.fecha {
     font-size: 25px;
+    margin-bottom: 10px; /* Espacio entre la fecha y la hora */
 }
 
-.tiempo{
-    letter-spacing: 0.1em;
-    font-size: 40px;
+/* Estilos para el párrafo de la hora */
+.tiempo {
+    font-size: 50px; /* Tamaño de fuente más grande para la hora */
+}
+
+/* Estilo para los separadores de la hora (los dos puntos) */
+.separador-tiempo {
+    animation: blink-animation 1s steps(2, start) infinite; /* Aplica animación de parpadeo */
+}
+
+/* Definición de la animación de parpadeo */
+@keyframes blink-animation {
+    to {
+        visibility: hidden; /* Hace el elemento invisible al final de la animación */
+    }
+}
+
+/* Contenedor para todos los controles (alarma, colores, zonas horarias) */
+.controles {
+    display: grid; /* Usa CSS Grid para organizar las secciones de control */
+    /* Columnas automáticas que se ajustan al ancho, con un mínimo de 300px */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px; /* Espacio entre las secciones de control */
+    width: 100%;
+    max-width: 1200px; /* Ancho máximo para el contenedor de controles */
+    background-color: rgba(0, 0, 0, 0.3); /* Fondo semi-transparente */
+    padding: 20px; /* Espaciado interno */
+    border-radius: 8px; /* Bordes redondeados */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil */
+}
+
+/* Estilos para cada sección de control (fieldset) */
+.control-seccion {
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde para la sección */
+    padding: 15px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilos para la leyenda (título) de cada sección de control */
+.control-seccion legend {
+    font-size: 1.1em;
+    padding: 0 10px; /* Espaciado horizontal para la leyenda */
+    color: var(--glow-color-1); /* Color usando variable CSS */
+}
+
+/* Estilos para los divs dentro de cada sección de control (generalmente contienen label + input) */
+.control-seccion div {
+    margin-bottom: 10px; /* Espacio debajo de cada par label/input */
+    display: flex; /* Para alinear label e input */
+    flex-wrap: wrap; /* Permite que los elementos se ajusten en pantallas pequeñas */
+    align-items: center; /* Centra verticalmente label e input */
+}
+
+/* Estilos para las etiquetas (label) dentro de los controles */
+.control-seccion label {
+    margin-right: 10px; /* Espacio a la derecha de la etiqueta */
+    flex-basis: 150px; /* Ancho base para las etiquetas */
+    flex-shrink: 0; /* Evita que la etiqueta se encoja */
+}
+
+/* Estilos generales para inputs, selects y botones dentro de los controles */
+.control-seccion input[type="time"],
+.control-seccion input[type="text"],
+.control-seccion input[type="color"],
+.control-seccion select,
+.control-seccion button {
+    font-family: 'Share Tech Mono', monospace; /* Misma fuente que el resto de la app */
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
+    color: var(--text-color); /* Color de texto usando variable */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Borde sutil */
+    border-radius: 4px; /* Bordes redondeados */
+    margin-top: 5px; /* Pequeño margen superior si se envuelven */
+    flex-grow: 1; /* Permite que ocupen el espacio restante en la fila */
+}
+
+/* Estilos específicos para el input de tipo color */
+.control-seccion input[type="color"] {
+    padding: 2px; /* Menos padding para el selector de color */
+    min-height: 30px; /* Altura mínima para que se vea bien */
+}
+
+/* Estilos para los botones dentro de los controles */
+.control-seccion button {
+    cursor: pointer; /* Cambia el cursor a mano */
+    background-color: var(--glow-color-1); /* Color de fondo usando variable */
+    color: var(--bg-color-2); /* Color de texto usando variable (contraste) */
+    font-weight: bold;
+    transition: background-color 0.3s ease; /* Transición suave para el hover */
+}
+
+.control-seccion button:hover {
+    background-color: var(--glow-color-2); /* Cambio de color al pasar el ratón */
+}
+
+/* Estilos para la lista de alarmas */
+#alarmList ul {
+    list-style: none; /* Quita los puntos de la lista */
+    padding-left: 0; /* Quita el padding por defecto de la lista */
+}
+
+#alarmList li {
+    background-color: rgba(0,0,0,0.2); /* Fondo semi-transparente para cada item */
+    padding: 5px;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    display: flex; /* Para alinear el texto y el botón de eliminar */
+    justify-content: space-between; /* Espacia el texto y el botón */
+    align-items: center; /* Centra verticalmente */
+}
+/* Estilos para el botón de eliminar alarma */
+#alarmList li button {
+    padding: 3px 6px;
+    font-size: 0.8em;
+    background-color: #ff4d4d; /* Color rojo para eliminar */
+    color: white;
+    border: none;
+}
+
+/* Estilos para el contenedor de relojes adicionales */
+#additionalClocksContainer .additional-clock {
+    border: 1px solid var(--glow-color-1); /* Borde usando variable */
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.2); /* Fondo semi-transparente */
+}
+/* Título de cada reloj adicional */
+#additionalClocksContainer .additional-clock h5 {
+    font-size: 1.1em;
+    color: var(--glow-color-2); /* Color usando variable */
+    margin-bottom: 5px;
+}
+/* Párrafo de tiempo de cada reloj adicional */
+#additionalClocksContainer .additional-clock p {
+    font-size: 1.3em; /* Tamaño ligeramente menor que el principal */
+}
+/* Botón para eliminar un reloj adicional */
+#additionalClocksContainer .additional-clock button {
+    margin-top: 5px;
+    padding: 3px 6px;
+    font-size: 0.8em;
+    background-color: #ff4d4d; /* Color rojo para eliminar */
 }

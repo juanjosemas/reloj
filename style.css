@@ -60,9 +60,9 @@ body.controls-active .main-display-container {
     background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 10px 20px;
+    padding: 10px 15px;
     font-family: 'Share Tech Mono', monospace;
-    font-size: 1em;
+    font-size: 0.9em;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
@@ -111,21 +111,21 @@ input[type=number] { -moz-appearance: textfield; }
 .timer-countdown { font-size: clamp(60px, 15vw, 160px); letter-spacing: 0.05em; margin-bottom: 20px; display: none; }
 .timer-view .timer-controls { margin-bottom: 0; }
 
-/* --- MODIFICADO: Estilos para botones de Cronómetro y Temporizador --- */
+/* Estilos para botones de Cronómetro y Temporizador */
 .stopwatch-controls,
 .timer-controls {
     display: flex;
     justify-content: center;
-    gap: 10px; /* Menos espacio entre botones */
+    gap: 10px;
     margin-bottom: 20px;
     width: 100%;
 }
 .stopwatch-controls button,
 .timer-controls button {
-    flex-grow: 1; /* Permite que los botones crezcan y se encojan */
-    max-width: 110px; /* Ancho máximo para cada botón */
-    padding: 10px 5px; /* Menos padding horizontal */
-    font-size: 0.9em; /* Fuente un poco más pequeña */
+    flex-grow: 1;
+    max-width: 110px;
+    padding: 10px 5px;
+    font-size: 0.9em;
 }
 button:disabled {
     background-color: rgba(255, 255, 255, 0.1) !important;
@@ -133,7 +133,7 @@ button:disabled {
     cursor: not-allowed;
 }
 
-/* --- Resto de estilos (sin cambios) --- */
+/* Resto de estilos del panel de controles, diálogo, etc. */
 .controles-container { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; padding-bottom: 80px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); transform: translateY(100%); visibility: hidden; opacity: 0; transition: transform 0.5s ease-in-out, visibility 0.5s, opacity 0.5s; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-height: 60vh; overflow-y: auto; }
 .controles-container.visible { transform: translateY(0); visibility: visible; opacity: 1; }
 .control-seccion { border: 1px solid rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 5px; display: flex; flex-direction: column; }

@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const themes = { 'neon-classic': { textColor: '#FFFFFF', bgColor1: '#0000FF', bgColor2: '#000000', glowColor1: '#E6AB0A' },'ocean': { textColor: '#E0FFFF', bgColor1: '#00008B', bgColor2: '#008B8B', glowColor1: '#00FFFF' },'sunset': { textColor: '#FFFFE0', bgColor1: '#FF4500', bgColor2: '#8B0000', glowColor1: '#FFD700' },'matrix': { textColor: '#39FF14', bgColor1: '#000000', bgColor2: '#080808', glowColor1: '#008F11' } };
     let settings = { alarms: [], textColor: '#FFFFFF', bgColor1: '#0000FF', bgColor2: '#000000', glowColor1: '#E6AB0A', additionalTimeZones: [], weatherLocation: null, useGeolocation: true };
-    let alarmSound = null; let activeAlarmId = null;
+    let alarmSound = null;
+    let activeAlarmId = null;
 
     // --- SELECCIÓN DE ELEMENTOS DEL DOM ---
     const $body = document.body;
@@ -53,29 +54,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LÓGICA DE NAVEGACIÓN ENTRE MODOS ---
     function switchMode(mode) {
         $body.dataset.mode = mode;
-        $modeNavButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+        $modeNavButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
         if (mode !== 'stopwatch' && stopwatchState.isRunning) stopStopwatch();
         if (mode !== 'timer' && timerState.isRunning) stopTimer();
     }
     
     // --- LÓGICA DEL CRONÓMETRO ---
     let stopwatchState = { isRunning: false, startTime: 0, elapsedTime: 0, laps: [], animationFrameId: null };
+    
+    // MODIFICADO: Muestra centésimas de segundo (2 dígitos)
     function formatStopwatchTime(ms) {
         const d = new Date(ms);
-        return `${String(d.getUTCMinutes()).padStart(2, '0')}:${String(d.getUTCSeconds()).padStart(2, '0')}.${String(d.getUTCMilliseconds()).padStart(3, '0')}`;
+        const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(d.getUTCSeconds()).padStart(2, '0');
+        const centiseconds = String(Math.floor(d.getUTCMilliseconds() / 10)).padStart(2, '0');
+        return `${minutes}:${seconds}.${centiseconds}`;
     }
+    
     function updateStopwatch() {
         $stopwatchTime.textContent = formatStopwatchTime(Date.now() - stopwatchState.startTime + stopwatchState.elapsedTime);
         stopwatchState.animationFrameId = requestAnimationFrame(updateStopwatch);
     }
+    
     function startStopwatch() {
         if (stopwatchState.isRunning) return;
         stopwatchState.isRunning = true;
         stopwatchState.startTime = Date.now();
         $startStopwatchBtn.textContent = 'Parar';
-        $lapBtn.disabled = false; $resetStopwatchBtn.disabled = false;
+        $lapBtn.disabled = false;
+        $resetStopwatchBtn.disabled = false;
         updateStopwatch();
     }
+    
     function stopStopwatch() {
         if (!stopwatchState.isRunning) return;
         stopwatchState.isRunning = false;
@@ -83,15 +95,19 @@ document.addEventListener('DOMContentLoaded', () => {
         cancelAnimationFrame(stopwatchState.animationFrameId);
         $startStopwatchBtn.textContent = 'Continuar';
     }
+    
+    // MODIFICADO: El valor de reinicio ahora tiene 2 dígitos para los milisegundos
     function resetStopwatch() {
         if (stopwatchState.isRunning) stopStopwatch();
         stopwatchState.elapsedTime = 0;
         stopwatchState.laps = [];
-        $stopwatchTime.textContent = '00:00:00.000';
+        $stopwatchTime.textContent = '00:00.00';
         $lapsList.innerHTML = '';
         $startStopwatchBtn.textContent = 'Iniciar';
-        $lapBtn.disabled = true; $resetStopwatchBtn.disabled = true;
+        $lapBtn.disabled = true;
+        $resetStopwatchBtn.disabled = true;
     }
+    
     function addLap() {
         if (!stopwatchState.isRunning) return;
         const lapTime = formatStopwatchTime(Date.now() - stopwatchState.startTime + stopwatchState.elapsedTime);
@@ -101,66 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
         $lapsList.prepend(li);
     }
 
-    // --- LÓGICA DEL TEMPORIZADOR (CORREGIDA) ---
+    // --- LÓGICA DEL TEMPORIZADOR ---
     let timerState = { isRunning: false, remainingTime: 0, intervalId: null };
-    function updateTimerDisplay() {
-        const minutes = String(Math.floor(timerState.remainingTime / 60000)).padStart(2, '0');
-        const seconds = String(Math.floor((timerState.remainingTime % 60000) / 1000)).padStart(2, '0');
-        $timerCountdown.textContent = `${minutes}:${seconds}`;
-    }
-    function startTimer() {
-        if (timerState.isRunning) return;
-        
-        // Si no está corriendo y no hay tiempo restante, coge el de los inputs
-        if (timerState.remainingTime <= 0) {
-            const minutes = parseInt($timerMinutesInput.value) || 0;
-            const seconds = parseInt($timerSecondsInput.value) || 0;
-            timerState.remainingTime = (minutes * 60 + seconds) * 1000;
-        }
-
-        if (timerState.remainingTime <= 0) return;
-        
-        timerState.isRunning = true;
-        const endTime = Date.now() + timerState.remainingTime;
-
-        $timerInputs.style.display = 'none'; $timerCountdown.style.display = 'block';
-        $startTimerBtn.textContent = 'Iniciar'; $startTimerBtn.disabled = true;
-        $stopTimerBtn.disabled = false; $resetTimerBtn.disabled = false;
-        
-        timerState.intervalId = setInterval(() => {
-            const newRemaining = endTime - Date.now();
-            if (newRemaining <= 0) {
-                clearInterval(timerState.intervalId);
-                timerState.remainingTime = 0;
-                updateTimerDisplay();
-                showAlarmDialog({ message: '¡Tiempo finalizado!' });
-                $stopTimerBtn.disabled = true;
-            } else {
-                timerState.remainingTime = newRemaining;
-                updateTimerDisplay();
-            }
-        }, 100);
-    }
-    function stopTimer() {
-        if (!timerState.isRunning) return;
-        timerState.isRunning = false;
-        clearInterval(timerState.intervalId);
-        $startTimerBtn.textContent = 'Continuar'; $startTimerBtn.disabled = false;
-        $stopTimerBtn.disabled = true;
-    }
-    function resetTimer() {
-        if (timerState.isRunning) stopTimer();
-        timerState.remainingTime = 0;
-        $timerInputs.style.display = 'flex'; $timerCountdown.style.display = 'none';
-        $startTimerBtn.textContent = 'Iniciar'; $startTimerBtn.disabled = false;
-        $stopTimerBtn.disabled = true; $resetTimerBtn.disabled = true;
-        // Restaura la vista del countdown al valor de los inputs
-        const minutes = String(parseInt($timerMinutesInput.value) || 0).padStart(2, '0');
-        const seconds = String(parseInt($timerSecondsInput.value) || 0).padStart(2, '0');
-        $timerCountdown.textContent = `${minutes}:${seconds}`;
-    }
+    function updateTimerDisplay() { const minutes = String(Math.floor(timerState.remainingTime / 60000)).padStart(2, '0'); const seconds = String(Math.floor((timerState.remainingTime % 60000) / 1000)).padStart(2, '0'); $timerCountdown.textContent = `${minutes}:${seconds}`; }
+    function startTimer() { if (timerState.isRunning) return; if (timerState.remainingTime <= 0) { const minutes = parseInt($timerMinutesInput.value) || 0; const seconds = parseInt($timerSecondsInput.value) || 0; timerState.remainingTime = (minutes * 60 + seconds) * 1000; } if (timerState.remainingTime <= 0) return; timerState.isRunning = true; const endTime = Date.now() + timerState.remainingTime; $timerInputs.style.display = 'none'; $timerCountdown.style.display = 'block'; $startTimerBtn.textContent = 'Iniciar'; $startTimerBtn.disabled = true; $stopTimerBtn.disabled = false; $resetTimerBtn.disabled = false; timerState.intervalId = setInterval(() => { const newRemaining = endTime - Date.now(); if (newRemaining <= 0) { clearInterval(timerState.intervalId); timerState.remainingTime = 0; updateTimerDisplay(); showAlarmDialog({ message: '¡Tiempo finalizado!' }); $stopTimerBtn.disabled = true; } else { timerState.remainingTime = newRemaining; updateTimerDisplay(); } }, 100); }
+    function stopTimer() { if (!timerState.isRunning) return; timerState.isRunning = false; clearInterval(timerState.intervalId); $startTimerBtn.textContent = 'Continuar'; $startTimerBtn.disabled = false; $stopTimerBtn.disabled = true; }
+    function resetTimer() { if (timerState.isRunning) stopTimer(); timerState.remainingTime = 0; $timerInputs.style.display = 'flex'; $timerCountdown.style.display = 'none'; $startTimerBtn.textContent = 'Iniciar'; $startTimerBtn.disabled = false; $stopTimerBtn.disabled = true; $resetTimerBtn.disabled = true; const minutes = String(parseInt($timerMinutesInput.value) || 0).padStart(2, '0'); const seconds = String(parseInt($timerSecondsInput.value) || 0).padStart(2, '0'); $timerCountdown.textContent = `${minutes}:${seconds}`; }
     
-    // --- LÓGICA DE ALARMAS MEJORADA (sin cambios) ---
+    // --- LÓGICA DE ALARMAS MEJORADA ---
     function playAlarmSound(loop = false) { if (alarmSound) { alarmSound.pause(); alarmSound.currentTime = 0; } alarmSound = new Audio('alarm.mp3'); alarmSound.loop = loop; alarmSound.play().catch(e => console.error("Error al reproducir sonido:", e)); }
     function stopAlarmSound() { if (alarmSound) { alarmSound.pause(); alarmSound.currentTime = 0; alarmSound = null; } }
     function showAlarmDialog(alarm) { activeAlarmId = alarm.id || 'timer_alarm'; $dialogMessage.textContent = alarm.message || '¡Es la hora!'; $alarmDialogOverlay.classList.add('visible'); playAlarmSound(true); }
@@ -169,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleSnoozeAlarm() { if (activeAlarmId && activeAlarmId !== 'timer_alarm') { const alarmIndex = settings.alarms.findIndex(a => a.id === activeAlarmId); if (alarmIndex !== -1) { const now = new Date(); now.setMinutes(now.getMinutes() + SNOOZE_MINUTES); const newHours = ('0' + now.getHours()).slice(-2); const newMinutes = ('0' + now.getMinutes()).slice(-2); settings.alarms[alarmIndex].time = `${newHours}:${newMinutes}`; renderAlarmList(); saveSettings(); } } hideAlarmDialog(); }
     function checkAlarms(currentTime) { if (activeAlarmId) return; const currentHM = ('0' + currentTime.getHours()).slice(-2) + ":" + ('0' + currentTime.getMinutes()).slice(-2); const triggeredAlarm = settings.alarms.find(alarm => alarm.time === currentHM); if (triggeredAlarm) { showAlarmDialog(triggeredAlarm); if (Notification.permission === 'granted') { new Notification(triggeredAlarm.message || '¡Alarma!', { body: `Son las ${triggeredAlarm.time}`, icon: 'icon.png' }); } } }
     
-    // --- RESTO DE FUNCIONES (sin cambios lógicos importantes) ---
+    // --- RESTO DE FUNCIONES ---
     $toggleControlsBtn.addEventListener('click', () => { $controlesContainer.classList.toggle('visible'); $body.classList.toggle('controls-active'); });
     async function getWeatherByCoords(lat, lon) { const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=es`; fetchAndDisplayWeather(url, `Coords: ${lat.toFixed(2)}, ${lon.toFixed(2)}`); }
     async function getWeatherByLocation(location) { if (!location) { return; } const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${API_KEY}&units=metric&lang=es`; fetchAndDisplayWeather(url, location); }

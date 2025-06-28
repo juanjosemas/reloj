@@ -1,50 +1,22 @@
-/* Variables CSS para una fácil personalización de colores */
-:root {
-    --text-color: #FFFFFF;
-    --bg-color-1: blue;
-    --bg-color-2: #000000;
-    --glow-color-1: rgb(230, 171, 10);
-}
+/* Variables CSS */
+:root { --text-color: #FFFFFF; --bg-color-1: blue; --bg-color-2: #000000; --glow-color-1: rgb(230, 171, 10); }
 
 /* Reset y Estilos Base */
 * { padding: 0; margin: 0; box-sizing: border-box; }
 body { width: 100%; height: 100vh; font-family: 'Share Tech Mono', monospace; color: var(--text-color); background: radial-gradient(ellipse at center, var(--bg-color-1) 0%, var(--bg-color-2) 100%); background-size: 200% 200%; overflow: hidden; position: relative; animation: move-background 30s ease-in-out infinite alternate; }
 @keyframes move-background { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-/* Distribución principal con Flexbox */
+/* Distribución principal */
 .app-container { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; }
-
-/* --- Barra lateral de relojes --- */
 .world-clocks-sidebar { display: none; flex-direction: column; gap: 20px; padding-right: 20px; margin-right: 20px; border-right: 1px solid rgba(255, 255, 255, 0.2); height: 80vh; overflow-y: auto; flex-shrink: 0; flex-basis: 220px; }
 @media (min-width: 992px), (orientation: landscape) { .world-clocks-sidebar { display: flex; } }
+.sidebar-clock-item { display: flex; flex-direction: column; }
+.sidebar-top-line { display: flex; align-items: baseline; gap: 0.4em; }
+.sidebar-clock-city, .sidebar-clock-time, .sidebar-hyphen { font-size: 1.1em; }
+.sidebar-clock-city { color: var(--glow-color-1); font-weight: bold; white-space: nowrap; }
+.sidebar-clock-date { font-size: 0.8em; opacity: 0.7; text-align: right; }
 
-/* --- MODIFICADO: Estilos para cada reloj en la barra lateral --- */
-.sidebar-clock-item {
-    display: flex;
-    flex-direction: column;
-}
-.sidebar-top-line {
-    display: flex;
-    align-items: baseline; /* Alinea ciudad y hora por la base del texto */
-    gap: 0.4em; /* Espacio entre ciudad, guion y hora */
-}
-.sidebar-clock-city,
-.sidebar-clock-time,
-.sidebar-hyphen {
-    font-size: 1.1em; /* Tamaño consistente y más pequeño para la línea superior */
-}
-.sidebar-clock-city {
-    color: var(--glow-color-1);
-    font-weight: bold;
-    white-space: nowrap; /* Evita que el nombre de la ciudad se parta */
-}
-.sidebar-clock-date {
-    font-size: 0.8em;
-    opacity: 0.7;
-    text-align: right; /* Alinea la fecha a la derecha para un look limpio */
-}
-
-/* Contenedor de la pantalla principal */
+/* Contenido Principal */
 .main-display-container { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 1200px; text-align: center; transition: transform 0.5s ease-in-out; }
 body.controls-active .main-display-container { transform: scale(0.8); }
 
@@ -57,7 +29,18 @@ body[data-mode="clock"] .clock-view { display: block; }
 body[data-mode="stopwatch"] .stopwatch-view { display: flex; flex-direction: column; align-items: center; }
 body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; align-items: center; }
 
-/* Estilos específicos de cada vista */
+/* --- NUEVO: Estilos para la animación de dígitos --- */
+.digit-display { display: flex; justify-content: center; align-items: center; }
+.digit-container { position: relative; overflow: hidden; } /* Crucial para el efecto */
+.digit { position: absolute; top: 0; left: 0; }
+.digit.new { transform: translateY(100%); } /* Empieza abajo, fuera de la vista */
+.digit.animate-in { animation: slide-in 0.3s forwards; }
+.digit.animate-out { animation: slide-out 0.3s forwards; }
+@keyframes slide-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes slide-out { from { transform: translateY(0); } to { transform: translateY(-100%); } }
+.colon { position: relative; /* Para que no se mueva por las animaciones */ }
+
+/* Estilos de Reloj Principal */
 .reloj-principal { text-shadow: 0 0 20px var(--glow-color-1); }
 .reloj-principal .fecha { margin-bottom: 15px; }
 @media (orientation: landscape) { .reloj-principal .fecha { font-size: clamp(25px, 3.5vw, 40px); } .reloj-principal .tiempo { font-size: clamp(50px, 8vw, 120px); } }
@@ -68,7 +51,9 @@ body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; ali
 .weather-temp, .weather-city { font-size: clamp(20px, 3vw, 30px); }
 .separador-tiempo { animation: blink-animation 1s steps(2, start) infinite; }
 @keyframes blink-animation { to { visibility: hidden; } }
-.stopwatch-time { font-size: clamp(50px, 10vw, 130px); letter-spacing: 0.05em; margin-bottom: 20px; }
+
+/* Estilos de Cronómetro y Temporizador */
+.stopwatch-time, .timer-countdown { font-size: clamp(50px, 10vw, 130px); letter-spacing: 0.05em; margin-bottom: 20px; }
 .laps-list { list-style: none; padding: 0 10px; max-height: 20vh; width: 80%; max-width: 400px; overflow-y: auto; text-align: left; background-color: rgba(0,0,0,0.2); border-radius: 5px; }
 .laps-list li { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .laps-list li:last-child { border-bottom: none; }
@@ -79,13 +64,14 @@ body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; ali
 .timer-inputs span { font-size: 3em; }
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
-.timer-countdown { font-size: clamp(60px, 15vw, 160px); letter-spacing: 0.05em; margin-bottom: 20px; display: none; }
+.timer-countdown { display: none; }
 .timer-view .timer-controls { margin-bottom: 0; }
 .stopwatch-controls, .timer-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; width: 100%; }
 .stopwatch-controls button, .timer-controls button { flex-grow: 1; max-width: 110px; padding: 10px 5px; font-size: 0.9em; }
 button:disabled { background-color: rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.4) !important; cursor: not-allowed; }
 
 /* Resto de estilos del panel de controles, diálogo, etc. */
+/* ... (sin cambios) ... */
 .controles-container { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; padding-bottom: 80px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); transform: translateY(100%); visibility: hidden; opacity: 0; transition: transform 0.5s ease-in-out, visibility 0.5s, opacity 0.5s; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-height: 80vh; overflow-y: auto; z-index: 1500; }
 .controles-container.visible { transform: translateY(0); visibility: visible; opacity: 1; }
 .control-seccion { border: 1px solid rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 5px; display: flex; flex-direction: column; }

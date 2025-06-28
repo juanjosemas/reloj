@@ -4,21 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const SNOOZE_MINUTES = 5;
     const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const themes = { 'neon-classic': { textColor: '#FFFFFF', bgColor1: '#0000FF', bgColor2: '#000000', glowColor1: '#E6AB0A' },'ocean': { textColor: '#E0FFFF', bgColor1: '#00008B', bgColor2: '#008B8B', glowColor1: '#00FFFF' },'sunset': { textColor: '#FFFFE0', bgColor1: '#FF4500', bgColor2: '#8B0000', glowColor1: '#FFD700' },'matrix': { textColor: '#39FF14', bgColor1: '#000000', bgColor2: '#080808', glowColor1: '#008F11' } };
-    let appState = {
-        settings: { alarms: [], textColor: '#FFFFFF', bgColor1: '#0000FF', bgColor2: '#000000', glowColor1: '#E6AB0A', additionalTimeZones: [], weatherLocation: null, useGeolocation: true },
-        stopwatch: { isRunning: false, startTime: 0, elapsedTime: 0, laps: [] },
-        timer: { isRunning: false, remainingTime: 0, endTime: 0 }
-    };
-    let alarmSound = null;
-    let activeAlarmId = null;
-    let stopwatchAnimationFrameId = null;
-    let timerIntervalId = null;
+    let appState = { settings: { alarms: [], textColor: '#FFFFFF', bgColor1: '#0000FF', bgColor2: '#000000', glowColor1: '#E6AB0A', additionalTimeZones: [], weatherLocation: null, useGeolocation: true }, stopwatch: { isRunning: false, startTime: 0, elapsedTime: 0, laps: [] }, timer: { isRunning: false, remainingTime: 0, endTime: 0 } };
+    let alarmSound = null; let activeAlarmId = null; let stopwatchAnimationFrameId = null; let timerIntervalId = null;
 
     // --- SELECCIÓN DE ELEMENTOS DEL DOM ---
     const $body = document.body;
     const $modeNavButtons = document.querySelectorAll('.mode-btn');
     const $fechaPrincipal = document.querySelector('.fecha');
-    const $tiempoPrincipal = document.querySelector('.tiempo');
+    const $tiempoPrincipal = document.querySelector('.reloj-principal .tiempo');
     const $worldClocksSidebar = document.querySelector('.world-clocks-sidebar');
     const $stopwatchTime = document.querySelector('.stopwatch-time');
     const $startStopwatchBtn = document.getElementById('startStopwatchBtn');
@@ -62,46 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchMode(mode) { $body.dataset.mode = mode; $modeNavButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode)); if (mode !== 'stopwatch' && appState.stopwatch.isRunning) stopStopwatch(); if (mode !== 'timer' && appState.timer.isRunning) stopTimer(); }
     function mainUpdateLoop() { const ahora = new Date(); updateClockDisplay(ahora); checkAlarms(ahora); updateSidebarClocks(ahora); if ($controlesContainer.classList.contains('visible')) updateAdditionalClocksInSettings(ahora); }
 
-    // --- LÓGICA DE LA BARRA LATERAL (SIDEBAR) ---
-    function renderSidebarClocks() {
-        $worldClocksSidebar.innerHTML = '';
-        if (appState.settings.additionalTimeZones.length === 0) {
-            $worldClocksSidebar.innerHTML = '<p class="sidebar-empty-msg" style="opacity: 0.5; font-size: 0.8em;">Añade zonas horarias en ⚙️</p>';
-            return;
-        }
-        appState.settings.additionalTimeZones.forEach(zone => {
-            const clockItem = document.createElement('div');
-            clockItem.className = 'sidebar-clock-item';
-            clockItem.dataset.zoneId = zone.id;
-            // MODIFICADO: Nueva estructura HTML para la barra lateral
-            clockItem.innerHTML = `
-                <div class="sidebar-top-line">
-                    <span class="sidebar-clock-city">${zone.name}</span>
-                    <span class="sidebar-hyphen">-</span>
-                    <span class="sidebar-clock-time">--:--:--</span>
-                </div>
-                <span class="sidebar-clock-date">--/--/----</span>
-            `;
-            $worldClocksSidebar.appendChild(clockItem);
-        });
-        updateSidebarClocks(new Date());
-    }
-    
-    function updateSidebarClocks(baseTime) {
-        document.querySelectorAll('.sidebar-clock-item').forEach(clockItem => {
-            const zoneId = clockItem.dataset.zoneId;
-            const timeEl = clockItem.querySelector('.sidebar-clock-time');
-            const dateEl = clockItem.querySelector('.sidebar-clock-date');
-            try {
-                const timeString = baseTime.toLocaleTimeString('es-ES', { timeZone: zoneId, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-                const dateString = baseTime.toLocaleDateString('es-ES', { timeZone: zoneId, day: '2-digit', month: '2-digit', year: 'numeric' });
-                timeEl.innerHTML = timeString.replace(/:/g, '<span class="separador-tiempo">:</span>');
-                dateEl.textContent = dateString;
-            } catch (e) { /* Manejo de error silencioso */ }
-        });
-    }
+    // --- LÓGICA DE LA BARRA LATERAL ---
+    function renderSidebarClocks() { $worldClocksSidebar.innerHTML = ''; if (appState.settings.additionalTimeZones.length === 0) { $worldClocksSidebar.innerHTML = '<p class="sidebar-empty-msg" style="opacity: 0.5; font-size: 0.8em;">Añade zonas horarias en ⚙️</p>'; return; } appState.settings.additionalTimeZones.forEach(zone => { const clockItem = document.createElement('div'); clockItem.className = 'sidebar-clock-item'; clockItem.dataset.zoneId = zone.id; clockItem.innerHTML = `<div class="sidebar-top-line"><span class="sidebar-clock-city">${zone.name}</span><span class="sidebar-hyphen">-</span><span class="sidebar-clock-time">--:--:--</span></div><span class="sidebar-clock-date">--/--/----</span>`; $worldClocksSidebar.appendChild(clockItem); }); updateSidebarClocks(new Date()); }
+    function updateSidebarClocks(baseTime) { document.querySelectorAll('.sidebar-clock-item').forEach(clockItem => { const zoneId = clockItem.dataset.zoneId; const timeEl = clockItem.querySelector('.sidebar-clock-time'); const dateEl = clockItem.querySelector('.sidebar-clock-date'); try { const timeString = baseTime.toLocaleTimeString('es-ES', { timeZone: zoneId, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }); const dateString = baseTime.toLocaleDateString('es-ES', { timeZone: zoneId, day: '2-digit', month: '2-digit', year: 'numeric' }); timeEl.innerHTML = timeString.replace(/:/g, '<span class="separador-tiempo">:</span>'); dateEl.textContent = dateString; } catch (e) {} }); }
 
-    // --- LÓGICA DEL CRONÓMETRO Y TEMPORIZADOR ---
+    // --- LÓGICA DEL CRONÓMETRO Y TEMPORIZADOR (sin cambios lógicos) ---
+    // (El resto del código está completo y sin cambios desde la última versión funcional)
     let stopwatchState = { isRunning: false, startTime: 0, elapsedTime: 0, laps: [], animationFrameId: null };
     function formatStopwatchTime(ms) { const d = new Date(ms); return `${String(d.getUTCMinutes()).padStart(2, '0')}:${String(d.getUTCSeconds()).padStart(2, '0')}.${String(Math.floor(d.getUTCMilliseconds() / 10)).padStart(2, '0')}`; }
     function updateStopwatch() { $stopwatchTime.textContent = formatStopwatchTime(Date.now() - appState.stopwatch.startTime + appState.stopwatch.elapsedTime); stopwatchAnimationFrameId = requestAnimationFrame(updateStopwatch); }
@@ -115,8 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function startTimer() { if (appState.timer.isRunning) return; if (appState.timer.remainingTime <= 0) { const minutes = parseInt($timerMinutesInput.value) || 0; const seconds = parseInt($timerSecondsInput.value) || 0; appState.timer.remainingTime = (minutes * 60 + seconds) * 1000; } if (appState.timer.remainingTime <= 0) return; appState.timer.isRunning = true; appState.timer.endTime = Date.now() + appState.timer.remainingTime; $timerInputs.style.display = 'none'; $timerCountdown.style.display = 'block'; $startTimerBtn.textContent = 'Iniciar'; $startTimerBtn.disabled = true; $stopTimerBtn.disabled = false; $resetTimerBtn.disabled = false; timerIntervalId = setInterval(() => { const newRemaining = appState.timer.endTime - Date.now(); if (newRemaining <= 0) { clearInterval(timerIntervalId); appState.timer.remainingTime = 0; updateTimerDisplay(); showAlarmDialog({ message: '¡Tiempo finalizado!' }); $stopTimerBtn.disabled = true; } else { appState.timer.remainingTime = newRemaining; updateTimerDisplay(); } saveState(); }, 100); saveState(); }
     function stopTimer() { if (!appState.timer.isRunning) return; appState.timer.isRunning = false; clearInterval(timerIntervalId); appState.timer.remainingTime = appState.timer.endTime - Date.now(); $startTimerBtn.textContent = 'Continuar'; $startTimerBtn.disabled = false; $stopTimerBtn.disabled = true; saveState(); }
     function resetTimer() { if (appState.timer.isRunning) stopTimer(); appState.timer.remainingTime = 0; $timerInputs.style.display = 'flex'; $timerCountdown.style.display = 'none'; $startTimerBtn.textContent = 'Iniciar'; $startTimerBtn.disabled = false; $stopTimerBtn.disabled = true; $resetTimerBtn.disabled = true; const minutes = String(parseInt($timerMinutesInput.value) || 0).padStart(2, '0'); const seconds = String(parseInt($timerSecondsInput.value) || 0).padStart(2, '0'); $timerCountdown.textContent = `${minutes}:${seconds}`; saveState(); }
-    
-    // --- LÓGICA DE ALARMAS, CLIMA, AJUSTES, etc. ---
     function updateClockDisplay(ahora) { const dia = ('0' + ahora.getDate()).slice(-2); const mesNum = ('0' + (ahora.getMonth() + 1)).slice(-2); const anio = ahora.getFullYear(); const diaSem = diasSemana[ahora.getDay()]; $fechaPrincipal.innerHTML = `${diaSem} ${dia}-${mesNum}-${anio}`; const horas = ('0' + ahora.getHours()).slice(-2); const minutos = ('0' + ahora.getMinutes()).slice(-2); const segundos = ('0' + ahora.getSeconds()).slice(-2); $tiempoPrincipal.innerHTML = `${horas}<span class="separador-tiempo">:</span>${minutos}<span class="separador-tiempo">:</span>${segundos}`; }
     function playAlarmSound(loop = false) { if (alarmSound) { alarmSound.pause(); alarmSound.currentTime = 0; } alarmSound = new Audio('alarm.mp3'); alarmSound.loop = loop; alarmSound.play().catch(e => console.error("Error al reproducir sonido:", e)); }
     function stopAlarmSound() { if (alarmSound) { alarmSound.pause(); alarmSound.currentTime = 0; alarmSound = null; } }
@@ -141,8 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAdditionalClocksInSettings() { $additionalClocksContainer.innerHTML = ''; appState.settings.additionalTimeZones.forEach(z => { const div = document.createElement('div'); div.className = 'additional-clock'; div.dataset.zoneId = z.id; div.innerHTML = `<h5>${z.name}</h5><p class="additional-time">...</p><button class="remove-tz-btn">Eliminar</button>`; div.querySelector('.remove-tz-btn').addEventListener('click', () => removeTimeZone(z.id)); $additionalClocksContainer.appendChild(div); }); updateAdditionalClocksInSettings(new Date()); }
     function removeTimeZone(id) { appState.settings.additionalTimeZones = appState.settings.additionalTimeZones.filter(z => z.id !== id); renderAdditionalClocksInSettings(); renderSidebarClocks(); saveState(); }
     function updateAdditionalClocksInSettings(baseTime) { document.querySelectorAll('#additionalClocksContainer .additional-clock').forEach(div => { const id = div.dataset.zoneId, el = div.querySelector('.additional-time'); try { const time = baseTime.toLocaleTimeString('es-ES', { timeZone: id, hour: '2-digit', minute: '2-digit', hour12: false }); el.innerHTML = `${time.replace(/:/g, '<span class="separador-tiempo">:</span>')}`; } catch (e) { el.textContent = "Error"; } }); }
-    
-    // --- PERSISTENCIA DE DATOS ---
     function saveState() { localStorage.setItem('relojAvanzadoState', JSON.stringify(appState)); }
     function loadState() {
         const savedState = localStorage.getItem('relojAvanzadoState');
@@ -150,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const loadedState = JSON.parse(savedState);
             const defaultState = JSON.parse(JSON.stringify(appState));
             appState.settings = { ...defaultState.settings, ...loadedState.settings };
-            
             if (loadedState.stopwatch) {
                 appState.stopwatch = loadedState.stopwatch;
                 if (appState.stopwatch.isRunning) {
@@ -163,35 +117,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 renderLaps();
             }
-
             if (loadedState.timer) {
                 appState.timer = loadedState.timer;
                 if (appState.timer.isRunning) {
                     const newRemaining = appState.timer.endTime - Date.now();
-                    if (newRemaining > 0) {
-                        appState.timer.remainingTime = newRemaining;
-                        startTimer();
-                    } else {
-                        appState.timer.remainingTime = 0;
-                        resetTimer();
-                    }
+                    if (newRemaining > 0) { appState.timer.remainingTime = newRemaining; startTimer(); }
+                    else { appState.timer.remainingTime = 0; resetTimer(); }
                 } else if (appState.timer.remainingTime > 0) {
-                    updateTimerDisplay();
-                    $timerInputs.style.display = 'none';
-                    $timerCountdown.style.display = 'block';
-                    $startTimerBtn.disabled = false;
-                    $startTimerBtn.textContent = 'Continuar';
-                    $stopTimerBtn.disabled = true;
-                    $resetTimerBtn.disabled = false;
-                } else {
-                    resetTimer();
-                }
+                    updateTimerDisplay(); $timerInputs.style.display = 'none'; $timerCountdown.style.display = 'block';
+                    $startTimerBtn.disabled = false; $startTimerBtn.textContent = 'Continuar';
+                    $stopTimerBtn.disabled = true; $resetTimerBtn.disabled = false;
+                } else { resetTimer(); }
             }
         }
-        applySettingsToUI();
-        renderAlarmList();
-        renderAdditionalClocksInSettings();
-        renderSidebarClocks();
+        applySettingsToUI(); renderAlarmList(); renderAdditionalClocksInSettings(); renderSidebarClocks();
         if (appState.settings.useGeolocation) { requestGeolocation(); }
         else if (appState.settings.weatherLocation) { getWeatherByLocation(appState.settings.weatherLocation); }
         if (!appState.timer.isRunning && appState.timer.remainingTime <= 0) resetTimer();

@@ -1,4 +1,4 @@
-/* Variables CSS para una fácil personalización de colores */
+/* Variables CSS para una fácil personalización de colores en toda la app. */
 :root {
     --text-color: #FFFFFF;
     --bg-color-1: blue;
@@ -6,84 +6,98 @@
     --glow-color-1: rgb(230, 171, 10);
 }
 
-/* Reset y Estilos Base */
+/* Reset básico para eliminar márgenes y paddings por defecto. */
 * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
 
+/* Estilos para el cuerpo de la página. */
 body {
     width: 100%;
     height: 100vh;
     font-family: 'Share Tech Mono', monospace;
     color: var(--text-color);
     background: radial-gradient(ellipse at center, var(--bg-color-1) 0%, var(--bg-color-2) 100%);
-    background-size: 200% 200%;
-    overflow: hidden;
+    background-size: 200% 200%; /* Tamaño mayor para que la animación tenga recorrido. */
+    overflow: hidden; /* Evita barras de scroll. */
     position: relative;
-    animation: move-background 30s ease-in-out infinite alternate;
+    animation: move-background 30s ease-in-out infinite alternate; /* Aplica la animación. */
 }
 
-/* Animación de fondo */
+/* Animación que mueve el centro del gradiente para un efecto dinámico. */
 @keyframes move-background {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* Contenedor principal para todas las vistas */
-.main-display-container {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 95%;
-    max-width: 1200px;
-    text-align: center;
-    transition: top 0.5s ease-in-out;
-}
-
-body.controls-active .main-display-container {
-    top: 20%;
-}
-
-/* Estilos para la navegación de modos */
-.mode-nav {
+/* Distribución principal con Flexbox para alinear la barra lateral y el contenido. */
+.app-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
 }
 
-.mode-btn {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 10px 15px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.9em;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+/* --- Estilos para la barra lateral de relojes --- */
+.world-clocks-sidebar {
+    display: none; /* Oculta por defecto en móviles verticales. */
+    flex-direction: column;
+    gap: 15px;
+    padding-right: 20px;
+    margin-right: 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    height: 80vh;
+    overflow-y: auto;
+    flex-shrink: 0; /* Evita que se encoja al reducir el espacio. */
+    flex-basis: 220px; /* Ancho base más pequeño. */
 }
 
-.mode-btn.active {
-    background-color: var(--glow-color-1);
-    color: var(--bg-color-2);
-    font-weight: bold;
+/* La @media query clave: muestra la barra lateral en pantallas anchas O en horizontal. */
+@media (min-width: 992px), (orientation: landscape) {
+    .world-clocks-sidebar {
+        display: flex;
+    }
 }
 
-/* Sistema para mostrar/ocultar vistas */
-.mode-view {
-    display: none;
+/* Estilos para cada reloj individual en la barra lateral. */
+.sidebar-clock-item { text-align: left; }
+.sidebar-clock-city { font-size: 1em; color: var(--glow-color-1); font-weight: bold; }
+.sidebar-clock-time { font-size: 1.5em; } /* Fuente más pequeña. */
+.sidebar-clock-date { font-size: 0.8em; opacity: 0.7; }
+
+/* --- Contenedor de la pantalla principal --- */
+.main-display-container {
+    flex-grow: 1; /* Ocupa el espacio restante. */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    text-align: center;
+    transition: transform 0.5s ease-in-out;
 }
 
+/* Reduce el tamaño del contenido principal cuando los controles están abiertos. */
+body.controls-active .main-display-container {
+    transform: scale(0.8);
+}
+
+/* --- Navegación y Vistas --- */
+.mode-nav { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; flex-wrap: nowrap; }
+.mode-btn { background-color: rgba(255, 255, 255, 0.1); color: var(--text-color); border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 12px; font-family: 'Share Tech Mono', monospace; font-size: 0.8em; border-radius: 5px; cursor: pointer; transition: background-color 0.3s, color 0.3s; }
+.mode-btn.active { background-color: var(--glow-color-1); color: var(--bg-color-2); font-weight: bold; }
+.mode-view { display: none; width: 100%; }
 body[data-mode="clock"] .clock-view { display: block; }
 body[data-mode="stopwatch"] .stopwatch-view { display: flex; flex-direction: column; align-items: center; }
 body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; align-items: center; }
 
-/* Estilos de la vista del Reloj Principal */
+/* --- Estilos específicos de cada vista --- */
+.reloj-principal { text-shadow: 0 0 20px var(--glow-color-1); }
 .reloj-principal .fecha { margin-bottom: 15px; }
 @media (orientation: landscape) { .reloj-principal .fecha { font-size: clamp(25px, 3.5vw, 40px); } .reloj-principal .tiempo { font-size: clamp(50px, 8vw, 120px); } }
 @media (orientation: portrait) { .reloj-principal .fecha { font-size: clamp(25px, 5vw, 50px); } .reloj-principal .tiempo { font-size: clamp(60px, 15vw, 150px); } }
@@ -93,15 +107,11 @@ body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; ali
 .weather-temp, .weather-city { font-size: clamp(20px, 3vw, 30px); }
 .separador-tiempo { animation: blink-animation 1s steps(2, start) infinite; }
 @keyframes blink-animation { to { visibility: hidden; } }
-
-/* Estilos para el Cronómetro */
 .stopwatch-time { font-size: clamp(50px, 10vw, 130px); letter-spacing: 0.05em; margin-bottom: 20px; }
 .laps-list { list-style: none; padding: 0 10px; max-height: 20vh; width: 80%; max-width: 400px; overflow-y: auto; text-align: left; background-color: rgba(0,0,0,0.2); border-radius: 5px; }
 .laps-list li { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .laps-list li:last-child { border-bottom: none; }
 .laps-list li .lap-number { color: var(--glow-color-1); }
-
-/* Estilos para el Temporizador */
 .timer-inputs { display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 20px; }
 .timer-inputs input { width: 100px; font-size: 3em; text-align: center; background: transparent; border: none; border-bottom: 2px solid var(--glow-color-1); color: var(--text-color); }
 .timer-inputs input:focus { outline: none; }
@@ -110,31 +120,12 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 input[type=number] { -moz-appearance: textfield; }
 .timer-countdown { font-size: clamp(60px, 15vw, 160px); letter-spacing: 0.05em; margin-bottom: 20px; display: none; }
 .timer-view .timer-controls { margin-bottom: 0; }
+.stopwatch-controls, .timer-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; width: 100%; }
+.stopwatch-controls button, .timer-controls button { flex-grow: 1; max-width: 110px; padding: 10px 5px; font-size: 0.9em; }
+button:disabled { background-color: rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.4) !important; cursor: not-allowed; }
 
-/* Estilos para botones de Cronómetro y Temporizador */
-.stopwatch-controls,
-.timer-controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    width: 100%;
-}
-.stopwatch-controls button,
-.timer-controls button {
-    flex-grow: 1;
-    max-width: 110px;
-    padding: 10px 5px;
-    font-size: 0.9em;
-}
-button:disabled {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    color: rgba(255, 255, 255, 0.4) !important;
-    cursor: not-allowed;
-}
-
-/* Resto de estilos del panel de controles, diálogo, etc. */
-.controles-container { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; padding-bottom: 80px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); transform: translateY(100%); visibility: hidden; opacity: 0; transition: transform 0.5s ease-in-out, visibility 0.5s, opacity 0.5s; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-height: 60vh; overflow-y: auto; }
+/* --- Panel de Controles, Diálogo de Alarma y Botón de Engranaje --- */
+.controles-container { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; padding-bottom: 80px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); transform: translateY(100%); visibility: hidden; opacity: 0; transition: transform 0.5s ease-in-out, visibility 0.5s, opacity 0.5s; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-height: 80vh; overflow-y: auto; z-index: 1500; }
 .controles-container.visible { transform: translateY(0); visibility: visible; opacity: 1; }
 .control-seccion { border: 1px solid rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 5px; display: flex; flex-direction: column; }
 .control-seccion legend { font-size: 1.1em; padding: 0 10px; color: var(--glow-color-1); }
@@ -155,7 +146,7 @@ button:disabled {
 #additionalClocksContainer .additional-clock { flex-direction: column; align-items: stretch; }
 #additionalClocksContainer .additional-clock h5 { font-size: 1.1em; color: var(--glow-color-1); }
 #additionalClocksContainer .additional-clock button { align-self: flex-end; }
-#toggleControlsBtn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background-color: rgba(0, 0, 0, 0.5); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 1000; transition: transform 0.3s ease; }
+#toggleControlsBtn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background-color: rgba(0, 0, 0, 0.5); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 2000; transition: transform 0.3s ease; }
 #toggleControlsBtn:hover { transform: scale(1.1) rotate(45deg); }
 .dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
 .dialog-overlay.visible { opacity: 1; visibility: visible; }

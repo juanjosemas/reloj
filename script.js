@@ -4,14 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const SNOOZE_MINUTES = 5;
     const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const themes = { 'neon-classic': { textColor: '#FFFFFF', bgColor1: '#0000FF', bgColor2: '#000000', glowColor1: '#E6AB0A' },'ocean': { textColor: '#E0FFFF', bgColor1: '#00008B', bgColor2: '#008B8B', glowColor1: '#00FFFF' },'sunset': { textColor: '#FFFFE0', bgColor1: '#FF4500', bgColor2: '#8B0000', glowColor1: '#FFD700' },'matrix': { textColor: '#39FF14', bgColor1: '#000000', bgColor2: '#080808', glowColor1: '#008F11' } };
-    
-    // Objeto para guardar toda la configuración y estado de la app.
     let appState = {
         settings: { alarms: [], textColor: '#FFFFFF', bgColor1: '#0000FF', bgColor2: '#000000', glowColor1: '#E6AB0A', additionalTimeZones: [], weatherLocation: null, useGeolocation: true },
         stopwatch: { isRunning: false, startTime: 0, elapsedTime: 0, laps: [] },
-        timer: { isRunning: false, remainingTime: 0 }
+        timer: { isRunning: false, remainingTime: 0, endTime: 0 }
     };
-
     let alarmSound = null;
     let activeAlarmId = null;
     let stopwatchAnimationFrameId = null;
@@ -65,11 +62,47 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchMode(mode) { $body.dataset.mode = mode; $modeNavButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode)); if (mode !== 'stopwatch' && appState.stopwatch.isRunning) stopStopwatch(); if (mode !== 'timer' && appState.timer.isRunning) stopTimer(); }
     function mainUpdateLoop() { const ahora = new Date(); updateClockDisplay(ahora); checkAlarms(ahora); updateSidebarClocks(ahora); if ($controlesContainer.classList.contains('visible')) updateAdditionalClocksInSettings(ahora); }
 
-    // --- LÓGICA DE LA BARRA LATERAL ---
-    function renderSidebarClocks() { $worldClocksSidebar.innerHTML = ''; if (appState.settings.additionalTimeZones.length === 0) { $worldClocksSidebar.innerHTML = '<p class="sidebar-empty-msg" style="opacity: 0.5; font-size: 0.8em;">Añade zonas horarias en ⚙️</p>'; return; } appState.settings.additionalTimeZones.forEach(zone => { const clockItem = document.createElement('div'); clockItem.className = 'sidebar-clock-item'; clockItem.dataset.zoneId = zone.id; clockItem.innerHTML = `<span class="sidebar-clock-city">${zone.name}</span><span class="sidebar-clock-time">--:--:--</span><span class="sidebar-clock-date">--/--/----</span>`; $worldClocksSidebar.appendChild(clockItem); }); updateSidebarClocks(new Date()); }
-    function updateSidebarClocks(baseTime) { document.querySelectorAll('.sidebar-clock-item').forEach(clockItem => { const zoneId = clockItem.dataset.zoneId; const timeEl = clockItem.querySelector('.sidebar-clock-time'); const dateEl = clockItem.querySelector('.sidebar-clock-date'); try { const timeString = baseTime.toLocaleTimeString('es-ES', { timeZone: zoneId, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }); const dateString = baseTime.toLocaleDateString('es-ES', { timeZone: zoneId, day: '2-digit', month: '2-digit', year: 'numeric' }); timeEl.innerHTML = timeString.replace(/:/g, '<span class="separador-tiempo">:</span>'); dateEl.textContent = dateString; } catch (e) {} }); }
+    // --- LÓGICA DE LA BARRA LATERAL (SIDEBAR) ---
+    function renderSidebarClocks() {
+        $worldClocksSidebar.innerHTML = '';
+        if (appState.settings.additionalTimeZones.length === 0) {
+            $worldClocksSidebar.innerHTML = '<p class="sidebar-empty-msg" style="opacity: 0.5; font-size: 0.8em;">Añade zonas horarias en ⚙️</p>';
+            return;
+        }
+        appState.settings.additionalTimeZones.forEach(zone => {
+            const clockItem = document.createElement('div');
+            clockItem.className = 'sidebar-clock-item';
+            clockItem.dataset.zoneId = zone.id;
+            // MODIFICADO: Nueva estructura HTML para la barra lateral
+            clockItem.innerHTML = `
+                <div class="sidebar-top-line">
+                    <span class="sidebar-clock-city">${zone.name}</span>
+                    <span class="sidebar-hyphen">-</span>
+                    <span class="sidebar-clock-time">--:--:--</span>
+                </div>
+                <span class="sidebar-clock-date">--/--/----</span>
+            `;
+            $worldClocksSidebar.appendChild(clockItem);
+        });
+        updateSidebarClocks(new Date());
+    }
+    
+    function updateSidebarClocks(baseTime) {
+        document.querySelectorAll('.sidebar-clock-item').forEach(clockItem => {
+            const zoneId = clockItem.dataset.zoneId;
+            const timeEl = clockItem.querySelector('.sidebar-clock-time');
+            const dateEl = clockItem.querySelector('.sidebar-clock-date');
+            try {
+                const timeString = baseTime.toLocaleTimeString('es-ES', { timeZone: zoneId, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                const dateString = baseTime.toLocaleDateString('es-ES', { timeZone: zoneId, day: '2-digit', month: '2-digit', year: 'numeric' });
+                timeEl.innerHTML = timeString.replace(/:/g, '<span class="separador-tiempo">:</span>');
+                dateEl.textContent = dateString;
+            } catch (e) { /* Manejo de error silencioso */ }
+        });
+    }
 
-    // --- LÓGICA DEL CRONÓMETRO ---
+    // --- LÓGICA DEL CRONÓMETRO Y TEMPORIZADOR ---
+    let stopwatchState = { isRunning: false, startTime: 0, elapsedTime: 0, laps: [], animationFrameId: null };
     function formatStopwatchTime(ms) { const d = new Date(ms); return `${String(d.getUTCMinutes()).padStart(2, '0')}:${String(d.getUTCSeconds()).padStart(2, '0')}.${String(Math.floor(d.getUTCMilliseconds() / 10)).padStart(2, '0')}`; }
     function updateStopwatch() { $stopwatchTime.textContent = formatStopwatchTime(Date.now() - appState.stopwatch.startTime + appState.stopwatch.elapsedTime); stopwatchAnimationFrameId = requestAnimationFrame(updateStopwatch); }
     function startStopwatch() { if (appState.stopwatch.isRunning) return; appState.stopwatch.isRunning = true; appState.stopwatch.startTime = Date.now(); $startStopwatchBtn.textContent = 'Parar'; $lapBtn.disabled = false; $resetStopwatchBtn.disabled = false; updateStopwatch(); saveState(); }
@@ -77,11 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetStopwatch() { if (appState.stopwatch.isRunning) stopStopwatch(); appState.stopwatch = { isRunning: false, startTime: 0, elapsedTime: 0, laps: [] }; $stopwatchTime.textContent = '00:00.00'; $lapsList.innerHTML = ''; $startStopwatchBtn.textContent = 'Iniciar'; $lapBtn.disabled = true; $resetStopwatchBtn.disabled = true; saveState(); }
     function addLap() { if (!appState.stopwatch.isRunning) return; const lapTime = formatStopwatchTime(Date.now() - appState.stopwatch.startTime + appState.stopwatch.elapsedTime); appState.stopwatch.laps.push(lapTime); renderLaps(); saveState(); }
     function renderLaps() { $lapsList.innerHTML = ''; appState.stopwatch.laps.forEach((lap, index) => { const li = document.createElement('li'); li.innerHTML = `<span class="lap-number">Vuelta ${index + 1}</span><span>${lap}</span>`; $lapsList.prepend(li); }); }
-
-    // --- LÓGICA DEL TEMPORIZADOR ---
+    let timerState = { isRunning: false, remainingTime: 0, intervalId: null };
     function updateTimerDisplay() { const minutes = String(Math.floor(appState.timer.remainingTime / 60000)).padStart(2, '0'); const seconds = String(Math.floor((appState.timer.remainingTime % 60000) / 1000)).padStart(2, '0'); $timerCountdown.textContent = `${minutes}:${seconds}`; }
-    function startTimer() { if (appState.timer.isRunning) return; if (appState.timer.remainingTime <= 0) { const minutes = parseInt($timerMinutesInput.value) || 0; const seconds = parseInt($timerSecondsInput.value) || 0; appState.timer.remainingTime = (minutes * 60 + seconds) * 1000; } if (appState.timer.remainingTime <= 0) return; appState.timer.isRunning = true; const endTime = Date.now() + appState.timer.remainingTime; $timerInputs.style.display = 'none'; $timerCountdown.style.display = 'block'; $startTimerBtn.textContent = 'Iniciar'; $startTimerBtn.disabled = true; $stopTimerBtn.disabled = false; $resetTimerBtn.disabled = false; timerIntervalId = setInterval(() => { const newRemaining = endTime - Date.now(); if (newRemaining <= 0) { clearInterval(timerIntervalId); appState.timer.remainingTime = 0; updateTimerDisplay(); showAlarmDialog({ message: '¡Tiempo finalizado!' }); $stopTimerBtn.disabled = true; } else { appState.timer.remainingTime = newRemaining; updateTimerDisplay(); } saveState(); }, 100); saveState(); }
-    function stopTimer() { if (!appState.timer.isRunning) return; appState.timer.isRunning = false; clearInterval(timerIntervalId); $startTimerBtn.textContent = 'Continuar'; $startTimerBtn.disabled = false; $stopTimerBtn.disabled = true; saveState(); }
+    function startTimer() { if (appState.timer.isRunning) return; if (appState.timer.remainingTime <= 0) { const minutes = parseInt($timerMinutesInput.value) || 0; const seconds = parseInt($timerSecondsInput.value) || 0; appState.timer.remainingTime = (minutes * 60 + seconds) * 1000; } if (appState.timer.remainingTime <= 0) return; appState.timer.isRunning = true; appState.timer.endTime = Date.now() + appState.timer.remainingTime; $timerInputs.style.display = 'none'; $timerCountdown.style.display = 'block'; $startTimerBtn.textContent = 'Iniciar'; $startTimerBtn.disabled = true; $stopTimerBtn.disabled = false; $resetTimerBtn.disabled = false; timerIntervalId = setInterval(() => { const newRemaining = appState.timer.endTime - Date.now(); if (newRemaining <= 0) { clearInterval(timerIntervalId); appState.timer.remainingTime = 0; updateTimerDisplay(); showAlarmDialog({ message: '¡Tiempo finalizado!' }); $stopTimerBtn.disabled = true; } else { appState.timer.remainingTime = newRemaining; updateTimerDisplay(); } saveState(); }, 100); saveState(); }
+    function stopTimer() { if (!appState.timer.isRunning) return; appState.timer.isRunning = false; clearInterval(timerIntervalId); appState.timer.remainingTime = appState.timer.endTime - Date.now(); $startTimerBtn.textContent = 'Continuar'; $startTimerBtn.disabled = false; $stopTimerBtn.disabled = true; saveState(); }
     function resetTimer() { if (appState.timer.isRunning) stopTimer(); appState.timer.remainingTime = 0; $timerInputs.style.display = 'flex'; $timerCountdown.style.display = 'none'; $startTimerBtn.textContent = 'Iniciar'; $startTimerBtn.disabled = false; $stopTimerBtn.disabled = true; $resetTimerBtn.disabled = true; const minutes = String(parseInt($timerMinutesInput.value) || 0).padStart(2, '0'); const seconds = String(parseInt($timerSecondsInput.value) || 0).padStart(2, '0'); $timerCountdown.textContent = `${minutes}:${seconds}`; saveState(); }
     
     // --- LÓGICA DE ALARMAS, CLIMA, AJUSTES, etc. ---
@@ -116,16 +148,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedState = localStorage.getItem('relojAvanzadoState');
         if (savedState) {
             const loadedState = JSON.parse(savedState);
-            // Fusionar el estado guardado con el por defecto
-            appState.settings = { ...appState.settings, ...loadedState.settings };
+            const defaultState = JSON.parse(JSON.stringify(appState));
+            appState.settings = { ...defaultState.settings, ...loadedState.settings };
             
-            // Restaurar estado del cronómetro
-            if(loadedState.stopwatch) {
+            if (loadedState.stopwatch) {
                 appState.stopwatch = loadedState.stopwatch;
                 if (appState.stopwatch.isRunning) {
                     const timePassedSinceSave = Date.now() - appState.stopwatch.startTime;
                     appState.stopwatch.elapsedTime += timePassedSinceSave;
-                    startStopwatch(); // Reanuda la animación
+                    startStopwatch();
                 } else {
                     $stopwatchTime.textContent = formatStopwatchTime(appState.stopwatch.elapsedTime);
                     if(appState.stopwatch.elapsedTime > 0) $startStopwatchBtn.textContent = 'Continuar';
@@ -133,12 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderLaps();
             }
 
-            // Restaurar estado del temporizador
-            if(loadedState.timer) {
+            if (loadedState.timer) {
                 appState.timer = loadedState.timer;
                 if (appState.timer.isRunning) {
-                    const endTime = appState.timer.endTime || (Date.now() + appState.timer.remainingTime);
-                    const newRemaining = endTime - Date.now();
+                    const newRemaining = appState.timer.endTime - Date.now();
                     if (newRemaining > 0) {
                         appState.timer.remainingTime = newRemaining;
                         startTimer();
@@ -146,8 +175,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         appState.timer.remainingTime = 0;
                         resetTimer();
                     }
-                } else {
+                } else if (appState.timer.remainingTime > 0) {
                     updateTimerDisplay();
+                    $timerInputs.style.display = 'none';
+                    $timerCountdown.style.display = 'block';
+                    $startTimerBtn.disabled = false;
+                    $startTimerBtn.textContent = 'Continuar';
+                    $stopTimerBtn.disabled = true;
+                    $resetTimerBtn.disabled = false;
+                } else {
+                    resetTimer();
                 }
             }
         }
@@ -157,10 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSidebarClocks();
         if (appState.settings.useGeolocation) { requestGeolocation(); }
         else if (appState.settings.weatherLocation) { getWeatherByLocation(appState.settings.weatherLocation); }
-        resetTimer();
+        if (!appState.timer.isRunning && appState.timer.remainingTime <= 0) resetTimer();
     }
     
     // --- ASIGNACIÓN DE EVENT LISTENERS ---
+    $toggleControlsBtn.addEventListener('click', () => { $controlesContainer.classList.toggle('visible'); $body.classList.toggle('controls-active'); });
     $modeNavButtons.forEach(btn => btn.addEventListener('click', () => switchMode(btn.dataset.mode)));
     $startStopwatchBtn.addEventListener('click', () => { if (appState.stopwatch.isRunning) stopStopwatch(); else startStopwatch(); });
     $lapBtn.addEventListener('click', addLap);
@@ -179,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $addTimeZoneBtn.addEventListener('click', addTimeZone);
 
     // --- INICIALIZACIÓN ---
-    loadState(); // Usamos la nueva función de carga
+    loadState();
     setInterval(mainUpdateLoop, 1000);
     mainUpdateLoop();
 });

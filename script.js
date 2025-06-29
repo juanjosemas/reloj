@@ -56,11 +56,50 @@ document.addEventListener('DOMContentLoaded', () => {
     function mainUpdateLoop() { const ahora = new Date(); updateClockDisplay(ahora); checkAlarms(ahora); updateSidebarClocks(ahora); if ($controlesContainer.classList.contains('visible')) updateAdditionalClocksInSettings(ahora); }
 
     // --- LÓGICA DE LA BARRA LATERAL ---
-    function renderSidebarClocks() { $worldClocksSidebar.innerHTML = ''; if (appState.settings.additionalTimeZones.length === 0) { $worldClocksSidebar.innerHTML = '<p class="sidebar-empty-msg" style="opacity: 0.5; font-size: 0.8em;">Añade zonas horarias en ⚙️</p>'; return; } appState.settings.additionalTimeZones.forEach(zone => { const clockItem = document.createElement('div'); clockItem.className = 'sidebar-clock-item'; clockItem.dataset.zoneId = zone.id; clockItem.innerHTML = `<div class="sidebar-top-line"><span class="sidebar-clock-city">${zone.name}</span><span class="sidebar-hyphen">-</span><span class="sidebar-clock-time">--:--:--</span></div><span class="sidebar-clock-date">--/--/----</span>`; $worldClocksSidebar.appendChild(clockItem); }); updateSidebarClocks(new Date()); }
-    function updateSidebarClocks(baseTime) { document.querySelectorAll('.sidebar-clock-item').forEach(clockItem => { const zoneId = clockItem.dataset.zoneId; const timeEl = clockItem.querySelector('.sidebar-clock-time'); const dateEl = clockItem.querySelector('.sidebar-clock-date'); try { const timeString = baseTime.toLocaleTimeString('es-ES', { timeZone: zoneId, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }); const dateString = baseTime.toLocaleDateString('es-ES', { timeZone: zoneId, day: '2-digit', month: '2-digit', year: 'numeric' }); timeEl.innerHTML = timeString.replace(/:/g, '<span class="separador-tiempo">:</span>'); dateEl.textContent = dateString; } catch (e) {} }); }
+    // --- MODIFICADO: renderSidebarClocks ahora crea spans separados para hora y fecha ---
+    function renderSidebarClocks() { 
+        $worldClocksSidebar.innerHTML = ''; 
+        if (appState.settings.additionalTimeZones.length === 0) { 
+            $worldClocksSidebar.innerHTML = '<p class="sidebar-empty-msg">Añade zonas horarias en ⚙️</p>'; 
+            return; 
+        } 
+        appState.settings.additionalTimeZones.forEach(zone => { 
+            const clockItem = document.createElement('div'); 
+            clockItem.className = 'sidebar-clock-item'; 
+            clockItem.dataset.zoneId = zone.id; 
+            // Nueva estructura con spans individuales para hora y fecha
+            clockItem.innerHTML = `<span class="sidebar-clock-city">${zone.name}:</span>
+                                   <div class="sidebar-clock-details">
+                                       <span class="sidebar-clock-time">--:--:--</span>
+                                       <span class="sidebar-clock-date">--/--/----</span>
+                                   </div>`;
+            $worldClocksSidebar.appendChild(clockItem); 
+        }); 
+        updateSidebarClocks(new Date()); 
+    }
+
+    // --- MODIFICADO: updateSidebarClocks ahora actualiza los spans de hora y fecha por separado ---
+    function updateSidebarClocks(baseTime) { 
+        document.querySelectorAll('.sidebar-clock-item').forEach(clockItem => { 
+            const zoneId = clockItem.dataset.zoneId;
+            const timeEl = clockItem.querySelector('.sidebar-clock-time'); 
+            const dateEl = clockItem.querySelector('.sidebar-clock-date');
+            
+            try { 
+                const timeString = baseTime.toLocaleTimeString('es-ES', { timeZone: zoneId, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }); 
+                const dateString = baseTime.toLocaleDateString('es-ES', { timeZone: zoneId, day: '2-digit', month: '2-digit', year: 'numeric' }); 
+                
+                if (timeEl) timeEl.innerHTML = timeString.replace(/:/g, '<span class="separador-tiempo">:</span>');
+                if (dateEl) dateEl.textContent = dateString;
+
+            } catch (e) {
+                if (timeEl) timeEl.textContent = "Error";
+                if (dateEl) dateEl.textContent = "";
+            } 
+        }); 
+    }
 
     // --- LÓGICA DEL CRONÓMETRO Y TEMPORIZADOR (sin cambios lógicos) ---
-    // (El resto del código está completo y sin cambios desde la última versión funcional)
     let stopwatchState = { isRunning: false, startTime: 0, elapsedTime: 0, laps: [], animationFrameId: null };
     function formatStopwatchTime(ms) { const d = new Date(ms); return `${String(d.getUTCMinutes()).padStart(2, '0')}:${String(d.getUTCSeconds()).padStart(2, '0')}.${String(Math.floor(d.getUTCMilliseconds() / 10)).padStart(2, '0')}`; }
     function updateStopwatch() { $stopwatchTime.textContent = formatStopwatchTime(Date.now() - appState.stopwatch.startTime + appState.stopwatch.elapsedTime); stopwatchAnimationFrameId = requestAnimationFrame(updateStopwatch); }

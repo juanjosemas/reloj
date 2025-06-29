@@ -9,12 +9,52 @@ body { width: 100%; height: 100vh; font-family: 'Share Tech Mono', monospace; co
 /* Distribución principal */
 .app-container { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; }
 .world-clocks-sidebar { display: none; flex-direction: column; gap: 20px; padding-right: 20px; margin-right: 20px; border-right: 1px solid rgba(255, 255, 255, 0.2); height: 80vh; overflow-y: auto; flex-shrink: 0; flex-basis: 220px; }
-@media (min-width: 992px), (orientation: landscape) { .world-clocks-sidebar { display: flex; } }
-.sidebar-clock-item { display: flex; flex-direction: column; }
-.sidebar-top-line { display: flex; align-items: baseline; gap: 0.4em; }
-.sidebar-clock-city, .sidebar-clock-time, .sidebar-hyphen { font-size: 1.1em; }
-.sidebar-clock-city { color: var(--glow-color-1); font-weight: bold; white-space: nowrap; }
-.sidebar-clock-date { font-size: 0.8em; opacity: 0.7; text-align: right; }
+
+@media (min-width: 992px), (orientation: landscape) { 
+    .world-clocks-sidebar { 
+        display: flex; 
+    } 
+}
+
+/* --- ESTILOS DE LA SIDEBAR --- */
+.sidebar-clock-item { 
+    display: flex; 
+    flex-direction: column;
+}
+
+.sidebar-clock-city { 
+    font-size: 1.1em;
+    color: var(--glow-color-1); 
+    font-weight: bold; 
+    white-space: nowrap; 
+}
+
+.sidebar-clock-details {
+    display: flex;
+    justify-content: space-between; 
+    align-items: baseline;
+    padding-left: 0.8em;
+    margin-top: 0.2em;
+    gap: 0.5em;
+}
+
+.sidebar-clock-time, .sidebar-clock-date {
+    font-size: 0.9em;
+    opacity: 0.9;
+    white-space: nowrap;
+}
+
+.sidebar-clock-time::after {
+    content: ' -';
+    opacity: 0.7;
+    margin-left: 0.25em;
+}
+
+.sidebar-clock-date {
+    opacity: 0.7; 
+}
+
+.sidebar-empty-msg { opacity: 0.5; font-size: 0.8em; }
 
 /* Contenido Principal */
 .main-display-container { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; max-width: 1200px; text-align: center; transition: transform 0.5s ease-in-out; }
@@ -29,23 +69,42 @@ body[data-mode="clock"] .clock-view { display: block; }
 body[data-mode="stopwatch"] .stopwatch-view { display: flex; flex-direction: column; align-items: center; }
 body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; align-items: center; }
 
-/* --- NUEVO: Estilos para la animación de dígitos --- */
+/* --- Estilos para la animación de dígitos --- */
 .digit-display { display: flex; justify-content: center; align-items: center; }
-.digit-container { position: relative; overflow: hidden; } /* Crucial para el efecto */
+.digit-container { position: relative; overflow: hidden; }
 .digit { position: absolute; top: 0; left: 0; }
-.digit.new { transform: translateY(100%); } /* Empieza abajo, fuera de la vista */
+.digit.new { transform: translateY(100%); }
 .digit.animate-in { animation: slide-in 0.3s forwards; }
 .digit.animate-out { animation: slide-out 0.3s forwards; }
 @keyframes slide-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes slide-out { from { transform: translateY(0); } to { transform: translateY(-100%); } }
-.colon { position: relative; /* Para que no se mueva por las animaciones */ }
+.colon { position: relative; }
 
 /* Estilos de Reloj Principal */
 .reloj-principal { text-shadow: 0 0 20px var(--glow-color-1); }
 .reloj-principal .fecha { margin-bottom: 15px; }
-@media (orientation: landscape) { .reloj-principal .fecha { font-size: clamp(25px, 3.5vw, 40px); } .reloj-principal .tiempo { font-size: clamp(50px, 8vw, 120px); } }
-@media (orientation: portrait) { .reloj-principal .fecha { font-size: clamp(25px, 5vw, 50px); } .reloj-principal .tiempo { font-size: clamp(60px, 15vw, 150px); } }
-.weather-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; opacity: 0; transition: opacity 0.5s ease-in-out; }
+
+/* --- MODIFICADO: AUMENTADOS LOS TAMAÑOS EN HORIZONTAL DRÁSTICAMENTE --- */
+@media (orientation: landscape) { 
+    .reloj-principal .fecha { font-size: clamp(40px, 6vw, 75px); } 
+    .reloj-principal .tiempo { font-size: clamp(80px, 15vw, 220px); }
+    .weather-container { transform: scale(1.3); margin-top: 25px; }
+}
+/* Tamaños para vertical se mantienen como estaban */
+@media (orientation: portrait) { 
+    .reloj-principal .fecha { font-size: clamp(30px, 6vw, 60px); } 
+    .reloj-principal .tiempo { font-size: clamp(70px, 18vw, 180px); } 
+}
+
+.weather-container { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 10px; 
+    margin-top: 20px; 
+    opacity: 0; 
+    transition: opacity 0.5s ease-in-out, transform 0.3s ease; 
+}
 .weather-container.visible { opacity: 1; }
 .weather-icon { width: clamp(40px, 5vw, 60px); filter: drop-shadow(0 0 5px var(--glow-color-1)); }
 .weather-temp, .weather-city { font-size: clamp(20px, 3vw, 30px); }
@@ -71,7 +130,6 @@ input[type=number] { -moz-appearance: textfield; }
 button:disabled { background-color: rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.4) !important; cursor: not-allowed; }
 
 /* Resto de estilos del panel de controles, diálogo, etc. */
-/* ... (sin cambios) ... */
 .controles-container { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; padding-bottom: 80px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); transform: translateY(100%); visibility: hidden; opacity: 0; transition: transform 0.5s ease-in-out, visibility 0.5s, opacity 0.5s; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-height: 80vh; overflow-y: auto; z-index: 1500; }
 .controles-container.visible { transform: translateY(0); visibility: visible; opacity: 1; }
 .control-seccion { border: 1px solid rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 5px; display: flex; flex-direction: column; }
@@ -106,3 +164,55 @@ button:disabled { background-color: rgba(255, 255, 255, 0.1) !important; color: 
 #snoozeBtn { background-color: rgba(255, 255, 255, 0.2); color: var(--text-color); border: 1px solid rgba(255, 255, 255, 0.4); }
 #stopAlarmBtn { background-color: var(--glow-color-1); color: var(--bg-color-2); border: 1px solid var(--glow-color-1); font-weight: bold; }
 .dialog-buttons button:hover { transform: scale(1.05); }
+
+
+/* --- Ajustes específicos para Móvil en Horizontal (pantallas pequeñas) --- */
+@media (orientation: landscape) and (max-height: 500px) {
+    body {
+        overflow-y: auto;
+    }
+
+    .app-container {
+        align-items: flex-start;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .world-clocks-sidebar {
+        flex-basis: 35%; 
+        flex-shrink: 1; 
+        max-width: 180px; 
+        height: auto; 
+        max-height: calc(100vh - 40px);
+        margin-right: 10px; 
+        padding-right: 10px;
+    }
+    
+    .sidebar-clock-city {
+        font-size: 0.9em;
+    }
+    .sidebar-clock-time, .sidebar-clock-date {
+        font-size: 0.8em;
+    }
+    .sidebar-clock-details {
+        /* --- MODIFICADO: Eliminado 'flex-wrap: wrap' para mantener hora y fecha en una línea --- */
+    }
+
+    .main-display-container {
+        min-width: 0;
+    }
+    
+    /* En movil horizontal, los tamaños del reloj principal son más pequeños para que quepan */
+    .reloj-principal .tiempo {
+        font-size: clamp(64px, 42vh, 65px) !important;
+    }
+
+    .reloj-principal .fecha {
+        font-size: clamp(16px, 4vh, 22px) !important;
+    }
+    
+    .weather-container {
+        margin-top: 10px;
+        transform: scale(0.8) !important;
+    }
+}

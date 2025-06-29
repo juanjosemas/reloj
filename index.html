@@ -79,7 +79,25 @@
     </div>
 
     <!-- El resto del HTML (controles, diálogo, etc.) no cambia -->
-    <div class="controles-container"><fieldset class="control-seccion"><legend>Alarma</legend><input type="time" id="alarmTime"><input type="text" id="alarmMessage" placeholder="Mensaje (opcional)"><button id="setAlarmBtn">Establecer Alarma</button><div id="alarmList"><h4>Alarmas Activas:</h4><ul></ul></div></fieldset><fieldset class="control-seccion"><legend>Colores</legend><div><label for="textColor">Texto:</label><input type="color" id="textColor"></div><div><label for="bgColor1">Fondo 1:</label><input type="color" id="bgColor1"></div><div><label for="bgColor2">Fondo 2:</label><input type="color" id="bgColor2"></div><div><label for="glowColor1">Brillo:</label><input type="color" id="glowColor1"></div><div class="theme-buttons"><button class="theme-btn" data-theme="neon-classic">Neón Clásico</button><button class="theme-btn" data-theme="ocean">Océano</button><button class="theme-btn" data-theme="sunset">Atardecer</button><button class="theme-btn" data-theme="matrix">Matrix</button></div></fieldset><fieldset class="control-seccion"><legend>Ubicación del Clima</legend><div class="location-input-group"><input type="text" id="locationInput" placeholder="Ej: Madrid, ES"><button id="geolocateBtn" title="Usar mi ubicación actual">📍</button></div><button id="searchWeatherBtn">Buscar Ciudad</button></fieldset><fieldset class="control-seccion"><legend>Zonas Horarias</legend><select id="timeZoneSelect"><option value="">Seleccionar zona...</option><option value="America/New_York">Nueva York</option><option value="Europe/London">Londres</option><option value="Asia/Tokyo">Tokio</option></select><button id="addTimeZoneBtn">Añadir Reloj</button><div id="additionalClocksContainer"></div></fieldset></div>
+    <div class="controles-container"><fieldset class="control-seccion"><legend>Alarma</legend><input type="time" id="alarmTime"><input type="text" id="alarmMessage" placeholder="Mensaje (opcional)"><button id="setAlarmBtn">Establecer Alarma</button><div id="alarmList"><h4>Alarmas Activas:</h4><ul></ul></div></fieldset><fieldset class="control-seccion"><legend>Colores</legend><div><label for="textColor">Texto:</label><input type="color" id="textColor"></div><div><label for="bgColor1">Fondo 1:</label><input type="color" id="bgColor1"></div><div><label for="bgColor2">Fondo 2:</label><input type="color" id="bgColor2"></div><div><label for="glowColor1">Brillo:</label><input type="color" id="glowColor1"></div><div class="theme-buttons"><button class="theme-btn" data-theme="neon-classic">Neón Clásico</button><button class="theme-btn" data-theme="ocean">Océano</button><button class="theme-btn" data-theme="sunset">Atardecer</button><button class="theme-btn" data-theme="matrix">Matrix</button></div></fieldset><fieldset class="control-seccion"><legend>Ubicación del Clima</legend><div class="location-input-group"><input type="text" id="locationInput" placeholder="Ej: Madrid, ES"><button id="geolocateBtn" title="Usar mi ubicación actual">📍</button></div><button id="searchWeatherBtn">Buscar Ciudad</button></fieldset><fieldset class="control-seccion"><legend>Zonas Horarias</legend><select id="timeZoneSelect"><option value="">Seleccionar zona...</option>
+    <option value="America/New_York">Nueva York</option>
+    
+    <option value="America/Los_Angeles">Los Angeles</option>
+    
+    <option value="Asia/Kuala_Lumpur">Kuala Lumpur (Malasia)</option>
+    
+    <option value="Asia/Manila">Manila (Filipinas)</option>
+    
+    <option value="Australia/Sydney">Sydney (Australia)</option>
+    
+    <option value="Africa/Malabo">Malabo (Guinea Ecuatorial)</option>
+    
+    <option value="Asia/Bangkok">Bangkok (Tailandia)</option>
+    
+    <option value="Europe/London">Londres</option>
+    
+    <option value="Asia/Tokyo">Tokio</option>
+    </select><button id="addTimeZoneBtn">Añadir Reloj</button><div id="additionalClocksContainer"></div></fieldset></div>
     <button id="toggleControlsBtn" title="Mostrar/Ocultar Controles">⚙️</button>
     <div id="alarmDialogOverlay" class="dialog-overlay"><div class="dialog-box"><h3>¡Alarma!</h3><p id="dialogMessage"></p><div class="dialog-buttons"><button id="snoozeBtn">Posponer (5 min)</button><button id="stopAlarmBtn">Detener</button></div></div></div>
     <script src="script.js"></script>

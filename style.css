@@ -81,7 +81,9 @@ body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; ali
 .colon { position: relative; }
 
 /* Estilos de Reloj Principal */
-.reloj-principal { text-shadow: 0 0 20px var(--glow-color-1); }
+.reloj-principal { text-shadow: 0 0 20px var(--glow-color-1); 
+  font-family: Sriracha;
+}
 .reloj-principal .fecha { margin-bottom: 15px; }
 
 /* --- MODIFICADO: AUMENTADOS LOS TAMAÑOS EN HORIZONTAL DRÁSTICAMENTE --- */
@@ -92,7 +94,7 @@ body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; ali
 }
 /* Tamaños para vertical se mantienen como estaban */
 @media (orientation: portrait) { 
-    .reloj-principal .fecha { font-size: clamp(30px, 6vw, 60px); } 
+    .reloj-principal .fecha { font-size: clamp(30px, 8vw, 60px); } 
     .reloj-principal .tiempo { font-size: clamp(70px, 18vw, 180px); } 
 }
 

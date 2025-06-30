@@ -62,7 +62,7 @@ body.controls-active .main-display-container { transform: scale(0.8); }
 
 /* Navegación y Vistas */
 .mode-nav { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; flex-wrap: nowrap; }
-.mode-btn { background-color: rgba(255, 255, 255, 0.1); color: var(--text-color); border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 12px; font-family: Piedra; font-size: 0.8em; border-radius: 50px; cursor: pointer; transition: background-color 0.3s, color 0.3s; 
+.mode-btn { background-color: rgba(255, 255, 255, 0.1); color: var(--text-color); border: 5px solid rgba(255, 255, 255, 0.7); padding: 8px 12px; font-family: Piedra; font-size: 0.8em; border-radius: 50px; cursor: pointer; transition: background-color 0.3s, color 0.3s; 
 font-style: italic;
 }
 .mode-btn.active { background-color: var(--glow-color-1); color: var(--bg-color-2); font-weight: bold; }

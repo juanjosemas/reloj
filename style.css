@@ -3,57 +3,21 @@
 
 /* Reset y Estilos Base */
 * { padding: 0; margin: 0; box-sizing: border-box; }
-body { width: 100%; height: 100vh; font-family: 'Share Tech Mono', monospace; color: var(--text-color); background: radial-gradient(ellipse at center, var(--bg-color-1) 0%, var(--bg-color-2) 100%); background-size: 200% 200%; overflow: hidden; position: relative; animation: move-background 30s ease-in-out infinite alternate; }
+body { width: 100%; height: 100vh; font-family: 'Share Tech Mono', monospace; color: var(--text-color); background: radial-gradient(ellipse at center, var(--bg-color-1) 0%, var(--bg-color-2) 100%); background-size: 200% 200%; overflow: hidden; position: relative; animation: move-background 30s ease-in-out infinite alternate; transition: background 2s ease-in-out; }
 @keyframes move-background { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
 /* Distribución principal */
 .app-container { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 20px; }
 .world-clocks-sidebar { display: none; flex-direction: column; gap: 20px; padding-right: 20px; margin-right: 20px; border-right: 1px solid rgba(255, 255, 255, 0.2); height: 80vh; overflow-y: auto; flex-shrink: 0; flex-basis: 220px; }
-
-@media (min-width: 992px), (orientation: landscape) { 
-    .world-clocks-sidebar { 
-        display: flex; 
-    } 
-}
+@media (min-width: 992px), (orientation: landscape) { .world-clocks-sidebar { display: flex; } }
 
 /* --- ESTILOS DE LA SIDEBAR --- */
-.sidebar-clock-item { 
-    display: flex; 
-    flex-direction: column;
-}
-
-.sidebar-clock-city { 
-    font-size: 1.1em;
-    color: var(--glow-color-1); 
-    font-weight: bold; 
-    white-space: nowrap; 
-}
-
-.sidebar-clock-details {
-    display: flex;
-    justify-content: space-between; 
-    align-items: baseline;
-    padding-left: 0.8em;
-    margin-top: 0.2em;
-    gap: 0.5em;
-}
-
-.sidebar-clock-time, .sidebar-clock-date {
-    font-size: 0.9em;
-    opacity: 0.9;
-    white-space: nowrap;
-}
-
-.sidebar-clock-time::after {
-    content: ' -';
-    opacity: 0.7;
-    margin-left: 0.25em;
-}
-
-.sidebar-clock-date {
-    opacity: 0.7; 
-}
-
+.sidebar-clock-item { display: flex; flex-direction: column; }
+.sidebar-clock-city { font-size: 1.1em; color: var(--glow-color-1); font-weight: bold; white-space: nowrap; }
+.sidebar-clock-details { display: flex; justify-content: space-between; align-items: baseline; padding-left: 0.8em; margin-top: 0.2em; gap: 0.5em; }
+.sidebar-clock-time, .sidebar-clock-date { font-size: 0.9em; opacity: 0.9; white-space: nowrap; }
+.sidebar-clock-time::after { content: ' -'; opacity: 0.7; margin-left: 0.25em; }
+.sidebar-clock-date { opacity: 0.7; }
 .sidebar-empty-msg { opacity: 0.5; font-size: 0.8em; }
 
 /* Contenido Principal */
@@ -62,61 +26,55 @@ body.controls-active .main-display-container { transform: scale(0.8); }
 
 /* Navegación y Vistas */
 .mode-nav { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; flex-wrap: nowrap; }
-.mode-btn { background-color: rgba(255, 255, 255, 0.1); color: var(--text-color); border: 5px solid rgba(255, 255, 255, 0.7); padding: 8px 12px; font-family: Piedra; font-size: 0.8em; border-radius: 50px; cursor: pointer; transition: background-color 0.3s, color 0.3s; 
-font-style: italic;
-}
+.mode-btn { background-color: rgba(255, 255, 255, 0.1); color: var(--text-color); border: 5px solid rgba(255, 255, 255, 0.7); padding: 8px 12px; font-family: Piedra; font-size: 0.8em; border-radius: 50px; cursor: pointer; transition: background-color 0.3s, color 0.3s; font-style: italic; }
 .mode-btn.active { background-color: var(--glow-color-1); color: var(--bg-color-2); font-weight: bold; }
 .mode-view { display: none; width: 100%; }
 body[data-mode="clock"] .clock-view { display: block; }
 body[data-mode="stopwatch"] .stopwatch-view { display: flex; flex-direction: column; align-items: center; }
 body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; align-items: center; }
 
-/* --- Estilos para la animación de dígitos --- */
+/* --- Estilos de Reloj Principal y dígitos --- */
+.reloj-principal { text-shadow: 0 0 20px var(--glow-color-1); font-family: Sriracha; }
+.reloj-principal .fecha { margin-bottom: 15px; }
+.solar-info { display: flex; justify-content: center; gap: 1.5em; margin-top: 10px; opacity: 0; font-size: clamp(14px, 2vw, 18px); transition: opacity 0.5s ease; }
+.solar-info.visible { opacity: 0.8; }
+.tiempo-wrapper { display: flex; align-items: flex-end; justify-content: center; gap: 0.25em; transition: transform 0.4s ease-in-out; }
 .digit-display { display: flex; justify-content: center; align-items: center; }
-.digit-container { position: relative; overflow: hidden; }
-.digit { position: absolute; top: 0; left: 0; }
+.digit-container { position: relative; overflow: hidden; height: 1.1em; width: 0.7em; line-height: 1.1em; }
+.digit { position: absolute; top: 0; left: 0; width: 100%; text-align: center; }
 .digit.new { transform: translateY(100%); }
 .digit.animate-in { animation: slide-in 0.3s forwards; }
 .digit.animate-out { animation: slide-out 0.3s forwards; }
 @keyframes slide-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes slide-out { from { transform: translateY(0); } to { transform: translateY(-100%); } }
-.colon { position: relative; }
+.colon { position: relative; animation: blink-animation 1s steps(2, start) infinite; }
+.am-pm { font-size: 0.3em; font-weight: bold; padding-bottom: 0.15em; }
 
-/* Estilos de Reloj Principal */
-.reloj-principal { text-shadow: 0 0 20px var(--glow-color-1); 
-  font-family: Sriracha;
-}
-.reloj-principal .fecha { margin-bottom: 15px; }
-
-/* --- MODIFICADO: AUMENTADOS LOS TAMAÑOS EN HORIZONTAL DRÁSTICAMENTE --- */
+/* --- TAMAÑOS DEL RELOJ --- */
 @media (orientation: landscape) { 
-    .reloj-principal .fecha { font-size: clamp(40px, 6vw, 75px); } 
-    .reloj-principal .tiempo { font-size: clamp(80px, 15vw, 220px); 
-    }
+    .reloj-principal .fecha { font-size: clamp(25px, 3.5vw, 40px); }
+    .reloj-principal .tiempo-wrapper { font-size: clamp(80px, 14vw, 200px); }
     .weather-container { transform: scale(1.3); margin-top: 25px; }
 }
-/* Tamaños para vertical se mantienen como estaban */
 @media (orientation: portrait) { 
-    .reloj-principal .fecha { font-size: clamp(30px, 8vw, 60px); } 
-    .reloj-principal .tiempo { font-size: clamp(70px, 18vw, 180px); } 
+    .reloj-principal .fecha { font-size: clamp(20px, 5vw, 30px); }
+    .reloj-principal .tiempo-wrapper { font-size: clamp(70px, 17vw, 165px); }
 }
+body.format-12h .tiempo-wrapper { transform: scale(0.85); }
 
-.weather-container { 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    gap: 10px; 
-    margin-top: 20px; 
-    opacity: 0; 
-    transition: opacity 0.5s ease-in-out, transform 0.3s ease; 
-}
+/* --- Estilos del Clima --- */
+.weather-container { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-top: 20px; opacity: 0; transition: opacity 0.5s ease-in-out, transform 0.3s ease; }
 .weather-container.visible { opacity: 1; }
+.main-weather { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .weather-icon { width: clamp(40px, 5vw, 60px); filter: drop-shadow(0 0 5px var(--glow-color-1)); }
 .weather-temp, .weather-city { font-size: clamp(20px, 3vw, 30px); }
-.separador-tiempo { animation: blink-animation 1s steps(2, start) infinite; }
+.weather-details { display: flex; flex-direction: column; align-items: center; gap: 0.2em; }
+.weather-humidity { font-size: 0.7em; opacity: 0.8; }
+.extra-weather-details { display: flex; gap: 1em; font-size: 0.6em; opacity: 0; transition: opacity 0.5s ease; }
+.extra-weather-details.visible { opacity: 0.7; }
 @keyframes blink-animation { to { visibility: hidden; } }
 
-/* Estilos de Cronómetro y Temporizador */
+/* --- Estilos de Cronómetro y Temporizador --- */
 .stopwatch-time, .timer-countdown { font-size: clamp(50px, 10vw, 130px); letter-spacing: 0.05em; margin-bottom: 20px; }
 .laps-list { list-style: none; padding: 0 10px; max-height: 20vh; width: 80%; max-width: 400px; overflow-y: auto; text-align: left; background-color: rgba(0,0,0,0.2); border-radius: 5px; }
 .laps-list li { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -126,29 +84,27 @@ body[data-mode="timer"] .timer-view { display: flex; flex-direction: column; ali
 .timer-inputs input { width: 100px; font-size: 3em; text-align: center; background: transparent; border: none; border-bottom: 2px solid var(--glow-color-1); color: var(--text-color); }
 .timer-inputs input:focus { outline: none; }
 .timer-inputs span { font-size: 3em; }
-input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; }
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .timer-countdown { display: none; }
-.timer-view .timer-controls { margin-bottom: 0; }
 .stopwatch-controls, .timer-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; width: 100%; }
 .stopwatch-controls button, .timer-controls button { flex-grow: 1; max-width: 110px; padding: 10px 5px; font-size: 0.9em; }
 button:disabled { background-color: rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.4) !important; cursor: not-allowed; }
 
-/* Resto de estilos del panel de controles, diálogo, etc. */
-.controles-container { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; padding-bottom: 80px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); transform: translateY(100%); visibility: hidden; opacity: 0; transition: transform 0.5s ease-in-out, visibility 0.5s, opacity 0.5s; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-height: 80vh; overflow-y: auto; z-index: 1500; }
+/* --- Estilos de Controles --- */
+.controles-container { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; padding-bottom: 80px; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); transform: translateY(100%); visibility: hidden; opacity: 0; transition: transform 0.5s ease-in-out, visibility 0.5s, opacity 0.5s; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-height: 80vh; overflow-y: auto; z-index: 1500; }
 .controles-container.visible { transform: translateY(0); visibility: visible; opacity: 1; }
-.control-seccion { border: 1px solid rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 5px; display: flex; flex-direction: column; }
+.control-seccion { border: 1px solid rgba(255, 255, 255, 0.3); padding: 15px; border-radius: 5px; display: flex; flex-direction: column; gap: 10px; }
 .control-seccion legend { font-size: 1.1em; padding: 0 10px; color: var(--glow-color-1); }
-.control-seccion > div { margin-bottom: 10px; display: flex; flex-wrap: wrap; align-items: center; }
+.control-seccion > div:not(.theme-buttons) { display: flex; flex-wrap: wrap; align-items: center; }
 .control-seccion label { margin-right: 10px; flex-basis: 80px; flex-shrink: 0; }
 .control-seccion input, .control-seccion select, .control-seccion button { font-family: 'Share Tech Mono', monospace; padding: 8px; background-color: rgba(255, 255, 255, 0.1); color: var(--text-color); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 4px; margin-top: 5px; flex-grow: 1; }
 .control-seccion input[type="color"] { padding: 2px; min-height: 30px; }
 .control-seccion button { cursor: pointer; background-color: var(--glow-color-1); color: var(--bg-color-2); font-weight: bold; }
 .location-input-group { display: flex; width: 100%; }
 .location-input-group input { flex-grow: 1; border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0; }
-.location-input-group button { flex-grow: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; }
-#geolocateBtn { font-size: 1.2em; padding: 0 12px; }
-.theme-buttons { flex-direction: column; gap: 5px; }
+#geolocateBtn { flex-grow: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; font-size: 1.2em; padding: 0 12px; }
+.theme-buttons { display: flex; flex-direction: column; gap: 5px; }
 .theme-btn { background-color: rgba(255,255,255,0.2); color: var(--text-color); }
 #alarmList ul { list-style: none; padding-left: 0; }
 #alarmList li, #additionalClocksContainer .additional-clock { background-color: rgba(0,0,0,0.2); padding: 5px; margin-bottom: 5px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; }
@@ -156,8 +112,24 @@ button:disabled { background-color: rgba(255, 255, 255, 0.1) !important; color: 
 #additionalClocksContainer .additional-clock { flex-direction: column; align-items: stretch; }
 #additionalClocksContainer .additional-clock h5 { font-size: 1.1em; color: var(--glow-color-1); }
 #additionalClocksContainer .additional-clock button { align-self: flex-end; }
-#toggleControlsBtn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background-color: rgba(0, 0, 0, 0.5); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 2000; transition: transform 0.3s ease; }
+#toggleFullscreenBtn, #toggleControlsBtn { position: fixed; bottom: 20px; width: 50px; height: 50px; background-color: rgba(0, 0, 0, 0.5); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 2000; transition: transform 0.3s ease; }
+#toggleControlsBtn { right: 20px; }
+#toggleFullscreenBtn { right: 80px; }
+#toggleControlsBtn:hover, #toggleFullscreenBtn:hover { transform: scale(1.1); }
 #toggleControlsBtn:hover { transform: scale(1.1) rotate(45deg); }
+
+.control-toggle-group { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.control-toggle-group label:first-of-type { flex-grow: 1; }
+.switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: var(--glow-color-1); }
+input:checked + .slider:before { transform: translateX(22px); }
+.slider.round { border-radius: 34px; }
+.slider.round:before { border-radius: 50%; }
+
+/* --- Estilos del diálogo de Alarma --- */
 .dialog-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
 .dialog-overlay.visible { opacity: 1; visibility: visible; }
 .dialog-box { background-color: rgba(10, 10, 20, 0.8); border: 1px solid var(--glow-color-1); box-shadow: 0 0 15px var(--glow-color-1); padding: 25px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px; transform: scale(0.9); transition: transform 0.3s ease; }
@@ -170,54 +142,21 @@ button:disabled { background-color: rgba(255, 255, 255, 0.1) !important; color: 
 #stopAlarmBtn { background-color: var(--glow-color-1); color: var(--bg-color-2); border: 1px solid var(--glow-color-1); font-weight: bold; }
 .dialog-buttons button:hover { transform: scale(1.05); }
 
+/* Clases para el fondo dinámico */
+body.theme-dynamic-morning { --bg-color-1: #87CEEB; --bg-color-2: #4682B4; --text-color: #000080; --glow-color-1: #FFD700; }
+body.theme-dynamic-day { --bg-color-1: #1E90FF; --bg-color-2: #0000CD; --text-color: #FFFFFF; --glow-color-1: #FFFFFF; }
+body.theme-dynamic-evening { --bg-color-1: #FF4500; --bg-color-2: #483D8B; --text-color: #FFFFE0; --glow-color-1: #FFD700; }
+body.theme-dynamic-night { --bg-color-1: #00008B; --bg-color-2: #000000; --text-color: #E0FFFF; --glow-color-1: #00FFFF; }
 
-/* --- Ajustes específicos para Móvil en Horizontal (pantallas pequeñas) --- */
+/* --- Ajustes Móvil Horizontal --- */
 @media (orientation: landscape) and (max-height: 500px) {
-    body {
-        overflow-y: auto;
-    }
-
-    .app-container {
-        align-items: flex-start;
-        height: auto;
-        min-height: 100vh;
-    }
-
-    .world-clocks-sidebar {
-        flex-basis: 35%; 
-        flex-shrink: 1; 
-        max-width: 180px; 
-        height: auto; 
-        max-height: calc(100vh - 40px);
-        margin-right: 10px; 
-        padding-right: 10px;
-    }
-    
-    .sidebar-clock-city {
-        font-size: 0.9em;
-    }
-    .sidebar-clock-time, .sidebar-clock-date {
-        font-size: 0.8em;
-    }
-    .sidebar-clock-details {
-        /* --- MODIFICADO: Eliminado 'flex-wrap: wrap' para mantener hora y fecha en una línea --- */
-    }
-
-    .main-display-container {
-        min-width: 0;
-    }
-    
-    /* En movil horizontal, los tamaños del reloj principal son más pequeños para que quepan */
-    .reloj-principal .tiempo {
-        font-size: clamp(64px, 42vh, 65px) !important;
-    }
-
-    .reloj-principal .fecha {
-        font-size: clamp(22px, 10vh, 22px) !important;
-    }
-    
-    .weather-container {
-        margin-top: 10px;
-        transform: scale(0.8) !important;
-    }
+    body { overflow-y: auto; }
+    .app-container { align-items: flex-start; height: auto; min-height: 100vh; }
+    .world-clocks-sidebar { flex-basis: 35%; flex-shrink: 1; max-width: 180px; height: auto; max-height: calc(100vh - 40px); margin-right: 10px; padding-right: 10px; }
+    .sidebar-clock-city { font-size: 0.9em; }
+    .sidebar-clock-time, .sidebar-clock-date { font-size: 0.8em; }
+    .main-display-container { min-width: 0; }
+    .reloj-principal .tiempo-wrapper { font-size: clamp(64px, 42vh, 65px) !important; }
+    .reloj-principal .fecha { font-size: clamp(22px, 10vh, 22px) !important; }
+    .weather-container { margin-top: 10px; transform: scale(0.8) !important; }
 }

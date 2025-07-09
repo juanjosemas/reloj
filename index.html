@@ -29,80 +29,79 @@
             <div class="mode-view clock-view">
                 <div class="reloj-principal">
                     <p class="fecha"></p>
-                    <!-- MODIFICADO: La estructura del tiempo ahora es un contenedor de dígitos. -->
-                    <div class="tiempo digit-display">
-                        <!-- Horas -->
-                        <div class="digit-container"><div class="digit">0</div></div>
-                        <div class="digit-container"><div class="digit">0</div></div>
-                        <div class="colon">:</div>
-                        <!-- Minutos -->
-                        <div class="digit-container"><div class="digit">0</div></div>
-                        <div class="digit-container"><div class="digit">0</div></div>
-                        <div class="colon">:</div>
-                        <!-- Segundos -->
-                        <div class="digit-container"><div class="digit">0</div></div>
-                        <div class="digit-container"><div class="digit">0</div></div>
+                    
+                    <div class="tiempo-wrapper">
+                        <div class="tiempo digit-display">
+                            <!-- Horas -->
+                            <div class="digit-container"><div class="digit">0</div></div>
+                            <div class="digit-container"><div class="digit">0</div></div>
+                            <div class="colon">:</div>
+                            <!-- Minutos -->
+                            <div class="digit-container"><div class="digit">0</div></div>
+                            <div class="digit-container"><div class="digit">0</div></div>
+                            <div class="colon">:</div>
+                            <!-- Segundos -->
+                            <div class="digit-container"><div class="digit">0</div></div>
+                            <div class="digit-container"><div class="digit">0</div></div>
+                        </div>
+                        <span class="am-pm"></span>
                     </div>
+
+                    <div class="solar-info">
+                        <span class="sunrise"></span>
+                        <span class="sunset"></span>
+                    </div>
+
                     <div class="weather-container">
-                        <img src="" alt="Icono del tiempo" class="weather-icon">
-                        <span class="weather-temp"></span>
-                        <span class="weather-city"></span>
+                        <div class="main-weather">
+                            <img src="" alt="Icono del tiempo" class="weather-icon">
+                            <div class="weather-details">
+                                <span class="weather-temp"></span>
+                                <span class="weather-humidity"></span>
+                            </div>
+                            <span class="weather-city"></span>
+                        </div>
+                        <div class="extra-weather-details">
+                            <span class="feels-like"></span>
+                            <span class="wind-speed"></span>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="mode-view stopwatch-view">
-                <!-- MODIFICADO: Estructura de dígitos para el cronómetro. -->
-                <div class="stopwatch-time digit-display">
-                    <div class="digit-container"><div class="digit">0</div></div>
-                    <div class="digit-container"><div class="digit">0</div></div>
-                    <div class="colon">:</div>
-                    <div class="digit-container"><div class="digit">0</div></div>
-                    <div class="digit-container"><div class="digit">0</div></div>
-                    <div class="colon">.</div>
-                    <div class="digit-container"><div class="digit">0</div></div>
-                    <div class="digit-container"><div class="digit">0</div></div>
-                </div>
+                <div class="stopwatch-time digit-display">00:00.00</div>
                 <div class="stopwatch-controls"><button id="startStopwatchBtn">Iniciar</button><button id="lapBtn" disabled>Vuelta</button><button id="resetStopwatchBtn" disabled>Reiniciar</button></div>
                 <ul class="laps-list"></ul>
             </div>
 
             <div class="mode-view timer-view">
                 <div class="timer-inputs"><input type="number" id="timerMinutes" min="0" max="99" value="5" placeholder="MM"><span>:</span><input type="number" id="timerSeconds" min="0" max="59" value="0" placeholder="SS"></div>
-                <!-- MODIFICADO: Estructura de dígitos para el temporizador. -->
-                <div class="timer-countdown digit-display">
-                    <div class="digit-container"><div class="digit">0</div></div>
-                    <div class="digit-container"><div class="digit">0</div></div>
-                    <div class="colon">:</div>
-                    <div class="digit-container"><div class="digit">0</div></div>
-                    <div class="digit-container"><div class="digit">0</div></div>
-                </div>
+                <div class="timer-countdown digit-display">05:00</div>
                 <div class="timer-controls"><button id="startTimerBtn">Iniciar</button><button id="stopTimerBtn" disabled>Parar</button><button id="resetTimerBtn" disabled>Reiniciar</button></div>
             </div>
         </main>
     </div>
 
-    <!-- El resto del HTML (controles, diálogo, etc.) no cambia -->
-    <div class="controles-container"><fieldset class="control-seccion"><legend>Alarma</legend><input type="time" id="alarmTime"><input type="text" id="alarmMessage" placeholder="Mensaje (opcional)"><button id="setAlarmBtn">Establecer Alarma</button><div id="alarmList"><h4>Alarmas Activas:</h4><ul></ul></div></fieldset><fieldset class="control-seccion"><legend>Colores</legend><div><label for="textColor">Texto:</label><input type="color" id="textColor"></div><div><label for="bgColor1">Fondo 1:</label><input type="color" id="bgColor1"></div><div><label for="bgColor2">Fondo 2:</label><input type="color" id="bgColor2"></div><div><label for="glowColor1">Brillo:</label><input type="color" id="glowColor1"></div><div class="theme-buttons"><button class="theme-btn" data-theme="neon-classic">Neón Clásico</button><button class="theme-btn" data-theme="ocean">Océano</button><button class="theme-btn" data-theme="sunset">Atardecer</button><button class="theme-btn" data-theme="matrix">Matrix</button></div></fieldset><fieldset class="control-seccion"><legend>Ubicación del Clima</legend><div class="location-input-group"><input type="text" id="locationInput" placeholder="Ej: Madrid, ES"><button id="geolocateBtn" title="Usar mi ubicación actual">📍</button></div><button id="searchWeatherBtn">Buscar Ciudad</button></fieldset><fieldset class="control-seccion"><legend>Zonas Horarias</legend><select id="timeZoneSelect"><option value="">Seleccionar zona...</option>
-    <option value="America/New_York">Nueva York</option>
+    <div class="controles-container">
+        <fieldset class="control-seccion"><legend>Alarma</legend><input type="time" id="alarmTime"><input type="text" id="alarmMessage" placeholder="Mensaje (opcional)"><button id="setAlarmBtn">Establecer Alarma</button><div id="alarmList"><h4>Alarmas Activas:</h4><ul></ul></div></fieldset>
+        
+        <fieldset class="control-seccion"><legend>Formato y Apariencia</legend>
+            <div class="control-toggle-group">
+                <label for="hour12Toggle">Formato 12 Horas</label>
+                <label class="switch"><input type="checkbox" id="hour12Toggle"><span class="slider round"></span></label>
+            </div>
+             <div class="control-toggle-group">
+                <label for="dynamicBgToggle">Fondo Dinámico</label>
+                <label class="switch"><input type="checkbox" id="dynamicBgToggle" checked><span class="slider round"></span></label>
+            </div>
+        </fieldset>
+
+        <fieldset class="control-seccion"><legend>Colores</legend><div><label for="textColor">Texto:</label><input type="color" id="textColor"></div><div><label for="bgColor1">Fondo 1:</label><input type="color" id="bgColor1"></div><div><label for="bgColor2">Fondo 2:</label><input type="color" id="bgColor2"></div><div><label for="glowColor1">Brillo:</label><input type="color" id="glowColor1"></div><div class="theme-buttons"><button class="theme-btn" data-theme="neon-classic">Neón Clásico</button><button class="theme-btn" data-theme="ocean">Océano</button><button class="theme-btn" data-theme="sunset">Atardecer</button><button class="theme-btn" data-theme="matrix">Matrix</button></div></fieldset><fieldset class="control-seccion"><legend>Ubicación del Clima</legend><div class="location-input-group"><input type="text" id="locationInput" placeholder="Ej: Madrid, ES"><button id="geolocateBtn" title="Usar mi ubicación actual">📍</button></div><button id="searchWeatherBtn">Buscar Ciudad</button></fieldset><fieldset class="control-seccion"><legend>Zonas Horarias</legend><select id="timeZoneSelect"><option value="">Seleccionar zona...</option><option value="America/New_York">Nueva York</option><option value="America/Los_Angeles">Los Angeles</option><option value="Asia/Kuala_Lumpur">Kuala Lumpur (Malasia)</option><option value="Asia/Manila">Manila (Filipinas)</option><option value="Australia/Sydney">Sydney (Australia)</option><option value="Africa/Malabo">Malabo (Guinea Ecuatorial)</option><option value="Asia/Bangkok">Bangkok (Tailandia)</option><option value="Europe/London">Londres</option><option value="Asia/Tokyo">Tokio</option></select><button id="addTimeZoneBtn">Añadir Reloj</button><div id="additionalClocksContainer"></div></fieldset></div>
     
-    <option value="America/Los_Angeles">Los Angeles</option>
-    
-    <option value="Asia/Kuala_Lumpur">Kuala Lumpur (Malasia)</option>
-    
-    <option value="Asia/Manila">Manila (Filipinas)</option>
-    
-    <option value="Australia/Sydney">Sydney (Australia)</option>
-    
-    <option value="Africa/Malabo">Malabo (Guinea Ecuatorial)</option>
-    
-    <option value="Asia/Bangkok">Bangkok (Tailandia)</option>
-    
-    <option value="Europe/London">Londres</option>
-    
-    <option value="Asia/Tokyo">Tokio</option>
-    </select><button id="addTimeZoneBtn">Añadir Reloj</button><div id="additionalClocksContainer"></div></fieldset></div>
+    <button id="toggleFullscreenBtn" title="Pantalla Completa">⛶</button>
     <button id="toggleControlsBtn" title="Mostrar/Ocultar Controles">⚙️</button>
+
     <div id="alarmDialogOverlay" class="dialog-overlay"><div class="dialog-box"><h3>¡Alarma!</h3><p id="dialogMessage"></p><div class="dialog-buttons"><button id="snoozeBtn">Posponer (5 min)</button><button id="stopAlarmBtn">Detener</button></div></div></div>
     <script src="script.js"></script>
 </body>

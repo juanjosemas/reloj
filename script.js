@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- LÓGICA DE PANTALLA COMPLETA ---
     function toggleFullscreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.error(`Error al entrar en pantalla completa: ${err.message}`)); } else { document.exitFullscreen(); } }
-    function updateFullscreenIcon() { $toggleFullscreenBtn.innerHTML = document.fullscreenElement ? '↘️↙️' : '⛶'; $toggleFullscreenBtn.title = document.fullscreenElement ? 'Salir de pantalla completa' : 'Pantalla Completa'; }
+    function updateFullscreenIcon() { $toggleFullscreenBtn.innerHTML = document.fullscreenElement ? '↙️' : '⛶'; $toggleFullscreenBtn.title = document.fullscreenElement ? 'Salir de pantalla completa' : 'Pantalla Completa'; }
     
     // --- RESTO DE FUNCIONES ---
     function addAlarm() { const time = $alarmTimeInput.value; if (!time) return alert("Selecciona una hora"); const message = $alarmMessageInput.value || "¡Alarma!"; appState.settings.alarms.push({ time, message, id: Date.now(), active: true }); renderAlarmList(); saveState(); $alarmTimeInput.value = ''; $alarmMessageInput.value = ''; }
